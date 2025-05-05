@@ -1,11 +1,12 @@
 #include "shell.h"
 
-static char	*__sh_extract(const char *line);
+static char	*__sh_extract(const char *line, size_t *);
 
 char	**sh_lnsplt(const char *line) {
 	char	**_arr;
 	size_t	_tok_cnt;
 	size_t	_tok_cap;
+	size_t	_tok_off;
 
 	_tok_cnt = 0;
 	_tok_cap = 16;
@@ -22,49 +23,87 @@ char	**sh_lnsplt(const char *line) {
 				return (0);
 			}
 		}
-		_arr[_tok_cnt] = __sh_extract(line);
+		_arr[_tok_cnt] = __sh_extract(line, &_tok_off);
 		if (!_arr[_tok_cnt]) {
 			sh_free2d((void **) _arr);
 			return (0);
 		}
 		_tok_cnt++;
-		line += strlen(_arr[_tok_cnt - 1]);
+		line += _tok_off;
 		while (*line && isspace(*line))
 			line++;
 	}
 	return (_arr);
 }
 
-static char	*__sh_extract(const char *line) {
+static char	*__sh_extract(const char *line, size_t *tok_off) {
 	char	*_lcpy;
 	char	*_str;
 
+	*tok_off = 0;
 	_lcpy = (char *) line;
 	/* if we encounter a space character */
-	while (isspace(*_lcpy)) {
+	while (*_lcpy && isspace(*_lcpy)) {
 		_lcpy++;
 	}
 	line = _lcpy;
+	if (!*line)
+		return (0);
 	/* if we encounter a "&&" operator */
 	if (
-		!strncmp(_lcpy, "&&", 2)
+		!strncmp(line, "&&", 2)
 	) {
 		_lcpy += 2;
 	}
 	/* if we encounter a "|" or ";" operators */
 	else if (
-		*_lcpy == '|' ||
-		*_lcpy == ';'
+		*line == '|' ||
+		*line == ';'
 	) {
 		_lcpy++;
 	}
+	else if (
+		*line == '\"'
+	) {
+		_lcpy = (char *) ++line;
+		while (*_lcpy && *_lcpy != '\"') {
+			_lcpy++;
+		}
+		if (!*_lcpy) {
+			fprintf(stderr, "shell: undisclosed double-quote\n");
+			return (0);
+		}
+		*tok_off = 2;
+	}
+	else if (
+		*line == '\''
+	) {
+		_lcpy = (char *) ++line;
+		while (*_lcpy && *_lcpy != '\'') {
+			_lcpy++;
+		}
+		if (!*_lcpy) {
+			fprintf(stderr, "shell: undisclosed single-quote\n");
+			return (0);
+		}
+		*tok_off = 2;
+	}
 	else {
-		while (*_lcpy && !isspace(*_lcpy)) {
+		while (
+			*_lcpy &&
+			!isspace(*_lcpy) &&
+			*_lcpy != '|' &&
+			*_lcpy != ';' &&
+			*_lcpy != '\"' &&
+			*_lcpy != '\'' &&
+			strncmp(line, "&&", 2)
+		) {
 			_lcpy++;
 		}
 	}
 	_str = strndup(line, _lcpy - line);
 	if (!_str)
 		return (0);
+	*tok_off += strlen(_str);
 	return (_str);
 }

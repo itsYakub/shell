@@ -1,0 +1,16 @@
+Done:
+
+- [X] Piping;
+- [X] Single/Double - Quotes;
+
+ToDo:
+
+- [ ] Multiline commends;
+- [ ] Redirection;
+- [ ] Variable expansion;
+- [ ] pwd, env, unset as builtins;
+- [ ] Setting env-var;
+
+Optional:
+
+- [ ] Heredoc;

@@ -6,7 +6,7 @@ shell
 *.o
 *.out
 *.exe
-*app
+*.app
 *.S
 
 # editor files
