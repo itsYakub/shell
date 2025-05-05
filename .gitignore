@@ -1,0 +1,16 @@
+# binary
+
+shell
+*.a
+*.so
+*.o
+*.out
+*.exe
+*app
+*.S
+
+# editor files
+
+*.swp
+*.swo
+.vscode/

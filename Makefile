@@ -1,0 +1,32 @@
+CC		= cc
+CFLAGS	= -Wall -Wextra -Werror
+LFLAGS	= -lreadline
+SRCS	= ./shell-utils.c ./shell-parse.c ./shell-exec.c ./shell-builtin.c ./shell.c
+OBJS	= $(SRCS:.c=.o)
+NAME	= shell
+
+.PHONY : all
+
+all : $(NAME)
+
+$(NAME) : $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
+
+$(OBJS) : %.o : %.c
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+.PHONY : clean
+
+clean:
+	rm -f $(NAME)
+	rm -f $(OBJS)
+
+.PHONY : debug
+
+debug : CFLAGS += -ggdb3 -O0
+debug : all
+
+.PHONY : release
+
+release : CFLAGS += -s -O3
+release : all
