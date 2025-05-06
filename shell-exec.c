@@ -1,9 +1,14 @@
 #include "shell.h"
 
 static int		__sh_exec(char **, int);
+
 static size_t	__sh_pipe_count(char **);
+
 static char		**__sh_next_pipe(char **);
 static char		**__sh_next_command(char **);
+
+static void	__sh_next_input_redir(char **);
+static void	__sh_next_output_redir(char **);
 
 int	sh_execute(char **cmd) {
 	int	_savestd[2];
@@ -18,6 +23,11 @@ int	sh_execute(char **cmd) {
 		if (!strcmp(*cmd, ";") || !strcmp(*cmd, "|") || !strcmp(*cmd, "&&")) {
 			cmd++;
 			continue;
+		}
+		__sh_next_input_redir(cmd);
+		__sh_next_output_redir(cmd);
+		if (!strcmp(*cmd, "<") || !strcmp(*cmd, ">") || !strcmp(*cmd, ">>")) {
+			cmd += 2;
 		}
 		if (__sh_pipe_count(cmd) > 1) {
 			if (!sh_isbltin(*cmd)) {
@@ -51,7 +61,6 @@ int	sh_execute(char **cmd) {
 					_tmpfd = dup(0);
 				}
 			}
-			/* TODO: Builtins */
 			else {
 				if (!strcmp(*cmd, "exit")) {
 					close(_tmpfd);
@@ -73,6 +82,8 @@ int	sh_execute(char **cmd) {
 				}
 			}
 			cmd = __sh_next_command(cmd);
+			dup2(_savestd[0], 0);
+			dup2(_savestd[1], 1);
 		}
 	}
 	close(_tmpfd);
@@ -85,8 +96,18 @@ static int	__sh_exec(char **av, int fd) {
 	char	**_avcp;
 
 	_avcp = av;
-	while (*_avcp && (strcmp(*_avcp, ";") && strcmp(*_avcp, "&&") && strcmp(*_avcp, "|")))
+	while (
+		*_avcp && (
+			strcmp(*_avcp, ";") &&
+			strcmp(*_avcp, "&&") &&
+			strcmp(*_avcp, "|") &&
+			strcmp(*_avcp, "<") &&
+			strcmp(*_avcp, ">") &&
+			strcmp(*_avcp, ">>")
+		)
+	) {
 		_avcp++;
+	}
 	*_avcp = 0;
 	dup2(fd, 0);
 	close(fd);
@@ -126,4 +147,45 @@ static char	**__sh_next_command(char **av) {
 		}
 	}
 	return (av);
+}
+
+static void	__sh_next_input_redir(char **av) {
+	int	_fd;
+
+	_fd = -1;
+	while (*av && ((strcmp(*av, ";") && strcmp(*av, "&&") && strcmp(*av, "|")))) {
+		if (*av && (!strcmp(*av, "<"))) {
+			av++;
+			_fd = open(*av, O_RDONLY, 0644);
+			if (_fd == -1) {
+				perror("shell");
+				return;
+			}
+			dup2(_fd, 0);
+			close(_fd);
+			return;
+		}
+		av++;
+	}
+}
+
+static void	__sh_next_output_redir(char **av) {
+	int	_fd;
+
+	_fd = -1;
+	while (*av && ((strcmp(*av, ";") && strcmp(*av, "&&") && strcmp(*av, "|")))) {
+		if (*av && (!strcmp(*av, ">"))) {
+			av++;
+			_fd = open(*av, O_TRUNC | O_CREAT | O_RDWR, 0644);
+			dup2(_fd, 1);
+			close(_fd);
+		}
+		else if (*av && (!strcmp(*av, ">>"))) {
+			av++;
+			_fd = open(*av, O_CREAT | O_RDWR, 0644);
+			dup2(_fd, 1);
+			close(_fd);
+		}
+		av++;
+	}
 }

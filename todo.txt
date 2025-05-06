@@ -14,3 +14,4 @@ ToDo:
 Optional:
 
 - [ ] Heredoc;
+- [ ] Status-line;

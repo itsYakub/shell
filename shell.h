@@ -6,6 +6,7 @@
 # if !defined (__cplusplus)
 #  include <stdbool.h>
 # endif
+# include <fcntl.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
