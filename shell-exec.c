@@ -11,32 +11,54 @@ static void	__sh_next_input_redir(char **);
 static void	__sh_next_output_redir(char **);
 
 int	sh_execute(char **cmd) {
-	int	_savestd[2];
-	int	_pipefd[2];
-	int	_tmpfd;
-	int	_stat;
+	char	**_cmd;
+	int		_savestd[2];
+	int		_pipefd[2];
+	int		_tmpfd;
+	int		_stat;
 
+	_cmd = cmd;
 	_savestd[0] = dup(0);
 	_savestd[1] = dup(1);
 	_tmpfd = dup(0);
-	while (*cmd) {
-		if (!strcmp(*cmd, ";") || !strcmp(*cmd, "|") || !strcmp(*cmd, "&&")) {
-			cmd++;
+	while (*_cmd) {
+		/* Skipping the special characters */
+		if (!strcmp(*_cmd, ";") || !strcmp(*_cmd, "|") || !strcmp(*_cmd, "&&")) {
+			_cmd++;
 			continue;
 		}
-		__sh_next_input_redir(cmd);
-		__sh_next_output_redir(cmd);
-		if (!strcmp(*cmd, "<") || !strcmp(*cmd, ">") || !strcmp(*cmd, ">>")) {
-			cmd += 2;
+
+		/* "&&" operator */
+		if (*_cmd && _cmd != cmd) {
+			if (!strcmp(*(_cmd - 1), "&&")) {
+				/* By convention, every other value than 0 means "failure".
+				 * "&&" executes another command only if the previous one finished successfully.
+				 * */
+				if (_stat) {
+					_cmd = __sh_next_command(_cmd);
+					continue;
+				}
+			}
 		}
-		if (__sh_pipe_count(cmd) > 1) {
-			if (!sh_isbltin(*cmd)) {
+
+		/* Setting up redirection */
+		__sh_next_input_redir(_cmd);
+		__sh_next_output_redir(_cmd);
+
+		/* If the command starts with redirection, skip it to the real command */
+		if (!strcmp(*_cmd, "<") || !strcmp(*_cmd, ">") || !strcmp(*_cmd, ">>")) {
+			_cmd += 2;
+		}
+
+		/* Command type: pipeline */
+		if (__sh_pipe_count(_cmd) > 1) {
+			if (!sh_isbltin(*_cmd)) {
 				pipe(_pipefd);
 				if (!fork()) {
 					dup2(_pipefd[1], 1);
 					close(_pipefd[0]);
 					close(_pipefd[1]);
-					__sh_exec(cmd, _tmpfd);
+					__sh_exec(_cmd, _tmpfd);
 				}
 				else {
 					close(_pipefd[1]);
@@ -44,15 +66,17 @@ int	sh_execute(char **cmd) {
 					_tmpfd = _pipefd[0];
 				}
 			}
+			/* For now built-ins are only executed by the regular command and not by pipelines */
 			else {
 				fprintf(stderr, "warn: can't pipe built-in commands\n");
 			}
-			cmd = __sh_next_pipe(cmd);
+			_cmd = __sh_next_pipe(_cmd);
 		}
+		/* Command type: regular */
 		else {
-			if (!sh_isbltin(*cmd)) {
+			if (!sh_isbltin(*_cmd)) {
 				if (!fork()) {
-					__sh_exec(cmd, _tmpfd);
+					__sh_exec(_cmd, _tmpfd);
 				}
 				else {
 					close(_tmpfd);
@@ -61,31 +85,35 @@ int	sh_execute(char **cmd) {
 					_tmpfd = dup(0);
 				}
 			}
+			/* built-in commands */
 			else {
-				if (!strcmp(*cmd, "exit")) {
+				if (!strcmp(*_cmd, "exit")) {
 					close(_tmpfd);
 					dup2(0, _savestd[0]); close(_savestd[0]);
 					dup2(1, _savestd[1]); close(_savestd[1]);
-					sh_free2d((void **) cmd);
+					sh_free2d((void **) _cmd);
 					exit(0);
 				}
-				else if (!strcmp(*cmd, "type")) {
-					if (!sh_bltin_type(cmd)) {
+				else if (!strcmp(*_cmd, "type")) {
+					if (!sh_bltin_type(_cmd)) {
 						break;
 					}
 				}
-				else if (!strcmp(*cmd, "cd")) {
-					if (chdir(cmd[1]) < 0) {
+				else if (!strcmp(*_cmd, "cd")) {
+					if (chdir(_cmd[1]) < 0) {
 						perror("cd");
 						break;
 					}
 				}
 			}
-			cmd = __sh_next_command(cmd);
-			dup2(_savestd[0], 0);
-			dup2(_savestd[1], 1);
+			_cmd = __sh_next_command(_cmd);
 		}
+		/* After every command, get the standard file - descriptors back to normal */
+		dup2(_savestd[0], 0);
+		dup2(_savestd[1], 1);
 	}
+
+	/* clean-up */
 	close(_tmpfd);
 	dup2(0, _savestd[0]); close(_savestd[0]);
 	dup2(1, _savestd[1]); close(_savestd[1]);
@@ -163,7 +191,6 @@ static void	__sh_next_input_redir(char **av) {
 			}
 			dup2(_fd, 0);
 			close(_fd);
-			return;
 		}
 		av++;
 	}
