@@ -31,6 +31,7 @@ char	**sh_lnsplt(const char *);
 /* shell-utils.c */
 void	sh_free(struct s_shell *);
 void	sh_free2d(void **);
+bool	sh_iskeyword(const char *);
 
 /* shell-builtin.c */
 bool	sh_isbltin(const char *);

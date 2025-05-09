@@ -16,3 +16,16 @@ void	sh_free2d(void **ptr) {
 	if (ptr)
 		free(ptr);
 }
+
+bool	sh_iskeyword(const char *cmd) {
+	if (!strcmp(cmd, ";") ||
+		!strcmp(cmd, "||") ||
+		!strcmp(cmd, "|") ||
+		!strcmp(cmd, "<") ||
+		!strcmp(cmd, ">") ||
+		!strcmp(cmd, ">>")
+	) {
+		return (false);
+	}
+	return (true);
+}

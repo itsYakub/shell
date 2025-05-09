@@ -48,10 +48,18 @@ int	sh_execute(struct s_shell *sh) {
 		/* Command execution happens here */
 		if (sh_isbltin(*_cmd)) {
 			if (!strcmp(*_cmd, "exit")) {
+				int	_exit;
+
+				if (*(_cmd + 1) && sh_iskeyword(*(_cmd + 1))) {
+					_exit = atoi(*(_cmd + 1));
+				}
+				else {
+					_exit = 0;
+				}
 				dup2(0, _savestd[0]); close(_savestd[0]);
 				dup2(1, _savestd[1]); close(_savestd[1]);
 				sh_free(sh);
-				exit(0);
+				exit(_exit);
 			}
 			else if (!strcmp(*_cmd, "cd")) {
 				if (chdir(*(_cmd + 1)) == -1) {
@@ -105,16 +113,7 @@ static int	__sh_exec(char **av) {
 	char	**_avcp;
 
 	_avcp = av;
-	while (
-		*_avcp && (
-			strcmp(*_avcp, ";") &&
-			strcmp(*_avcp, "&&") &&
-			strcmp(*_avcp, "|") &&
-			strcmp(*_avcp, "<") &&
-			strcmp(*_avcp, ">") &&
-			strcmp(*_avcp, ">>")
-		)
-	) {
+	while (*_avcp && sh_iskeyword(*_avcp)) {
 		_avcp++;
 	}
 	*_avcp = 0;
