@@ -49,5 +49,7 @@ static void	__sh_bltin_type_loc(const char *util) {
 		}
 		if (*_path)
 			fprintf(stdout, "%s\n", _path);
+		else
+			fprintf(stdout, "(none)\n");
 	}
 }

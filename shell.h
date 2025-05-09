@@ -16,15 +16,21 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 
+struct s_shell {
+	char	**tokens;
+	char	*input;
+	int		exit_stat;
+};
+
 /* shell-exec.c */
-int		sh_execute(char **);
+int		sh_execute(struct s_shell *);
 
 /* shell-parse.c */
 char	**sh_lnsplt(const char *);
 
 /* shell-utils.c */
+void	sh_free(struct s_shell *);
 void	sh_free2d(void **);
-void	sh_clear_fbuf(FILE *);
 
 /* shell-builtin.c */
 bool	sh_isbltin(const char *);

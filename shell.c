@@ -4,31 +4,24 @@ static void	__sh_enable_ctrlc(int);
 static void	__sh_disable_ctrlc(int);
 
 int main(void) {
-	char	**_tokens;
-	char	*_line;
+	struct s_shell	_sh;
 
-	_line = 0;
-	_tokens = 0;
 	while (1) {
 		signal(SIGINT, __sh_enable_ctrlc);
-		_line = readline("$ ");
+		_sh.input = readline("$ ");
 		fflush(stdin);
 		signal(SIGINT, __sh_disable_ctrlc);
-		if (_line) {
-			add_history(_line);
-			_tokens = sh_lnsplt(_line);
-			if (_tokens) {
-				sh_execute(_tokens);
-				sh_free2d((void **) _tokens); _tokens = 0;
+		if (_sh.input) {
+			add_history(_sh.input);
+			_sh.tokens = sh_lnsplt(_sh.input);
+			if (_sh.tokens) {
+				sh_execute(&_sh);
 			}
-			free(_line); _line = 0;
 		}
+		sh_free(&_sh);
 	}
 	rl_clear_history();
-	if (_line)
-		free(_line);
-	if (_tokens)
-		sh_free2d((void **) _tokens);
+	sh_free(&_sh);
 	return (0);
 }
 
