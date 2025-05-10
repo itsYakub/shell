@@ -36,6 +36,31 @@ char	**sh_lnsplt(const char *line) {
 	return (_arr);
 }
 
+bool	sh_parse_err(char **t) {
+	while (*t) {
+		/* check if redirection has a valid direction after the operator */
+		if (!strcmp(*t, "<") || !strcmp(*t, ">") || !strcmp(*t, ">>")) {
+			if (*(t + 1) || !sh_iskeyword(*(t + 1))) {
+				return (!fprintf(stderr, "shell: parse error: %s\n", *t));
+			}
+		}
+		/* check if pipe is correctly used (isn't the last token and the pipe has keywords) */
+		else if (!strcmp(*t, "|")) {
+			if (!*(t + 1) || !strcmp(*(t + 1), "|")) {
+				return (!fprintf(stderr, "shell: parse error: %s\n", *t));
+			}
+		}
+		/* check if next-command is correctly used */
+		else if (!strcmp(*t, "&&") || !strcmp(*t, ";")) {
+			if (!*(t + 1)) {
+				return (!fprintf(stderr, "shell: parse error: %s\n", *t));
+			}
+		}
+		t++;
+	}
+	return (true);
+}
+
 static char	*__sh_extract(const char *line, size_t *tok_off) {
 	char	*_lcpy;
 	char	*_str;

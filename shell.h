@@ -22,6 +22,7 @@ struct s_shell {
 	int		exit_stat;
 	int		fd_stdin;
 	int		fd_stdout;
+	int		pid;
 };
 
 /* shell.c */
@@ -33,6 +34,7 @@ int		sh_execute(struct s_shell *);
 
 /* shell-parse.c */
 char	**sh_lnsplt(const char *);
+bool	sh_parse_err(char **);
 
 /* shell-utils.c */
 void	sh_free(struct s_shell *);

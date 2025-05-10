@@ -16,7 +16,9 @@ int main(void) {
 			add_history(_sh.input);
 			_sh.tokens = sh_lnsplt(_sh.input);
 			if (_sh.tokens) {
-				sh_execute(&_sh);
+				if (sh_parse_err(_sh.tokens)) {
+					sh_execute(&_sh);
+				}
 			}
 		}
 		sh_free(&_sh);
@@ -33,6 +35,7 @@ int	sh_init(struct s_shell *sh) {
 	memset(sh, 0, sizeof(struct s_shell));
 	sh->fd_stdin = dup(0);
 	sh->fd_stdout = dup(0);
+	sh->pid = getpid();
 	return (1);
 }
 
