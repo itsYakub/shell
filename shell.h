@@ -20,7 +20,13 @@ struct s_shell {
 	char	**tokens;
 	char	*input;
 	int		exit_stat;
+	int		fd_stdin;
+	int		fd_stdout;
 };
+
+/* shell.c */
+int		sh_init(struct s_shell *);
+int		sh_quit(struct s_shell *);
 
 /* shell-exec.c */
 int		sh_execute(struct s_shell *);
@@ -35,6 +41,14 @@ bool	sh_iskeyword(const char *);
 
 /* shell-builtin.c */
 bool	sh_isbltin(const char *);
+int		sh_bltin_exit(struct s_shell *, char **);
+int		sh_bltin_cd(char **);
 int		sh_bltin_type(char **);
+
+/* shell-redirect.c */
+char	**sh_handle_redirect(char **);
+void	sh_handle_input_redir(char **);
+void	sh_handle_output_redir(char **);
+void	sh_reset_redirect(struct s_shell *);
 
 #endif

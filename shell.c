@@ -6,6 +6,7 @@ static void	__sh_disable_ctrlc(int);
 int main(void) {
 	struct s_shell	_sh;
 
+	sh_init(&_sh);
 	while (1) {
 		signal(SIGINT, __sh_enable_ctrlc);
 		_sh.input = readline("$ ");
@@ -21,8 +22,28 @@ int main(void) {
 		sh_free(&_sh);
 	}
 	rl_clear_history();
-	sh_free(&_sh);
-	return (0);
+	sh_quit(&_sh);
+	exit(0);
+}
+
+int	sh_init(struct s_shell *sh) {
+	if (!sh) {
+		return (0);
+	}
+	memset(sh, 0, sizeof(struct s_shell));
+	sh->fd_stdin = dup(0);
+	sh->fd_stdout = dup(0);
+	return (1);
+}
+
+int	sh_quit(struct s_shell *sh) {	
+	if (!sh) {
+		return (0);
+	}
+	dup2(sh->fd_stdin, 0); close(sh->fd_stdin);
+	dup2(sh->fd_stdout, 1); close(sh->fd_stdout);
+	sh_free(sh);
+	return (1);
 }
 
 static void	__sh_enable_ctrlc(int sig) {

@@ -10,6 +10,41 @@ bool	sh_isbltin(const char *s) {
 	);
 }
 
+int	sh_bltin_exit(struct s_shell *sh, char **cmd) {
+	int	_exit;
+
+	if (*(cmd + 1) && sh_iskeyword(*(cmd + 1))) {
+		_exit = atoi(*(cmd + 1));
+	}
+	else {
+		_exit = 0;
+	}
+
+	rl_clear_history();
+	sh_quit(sh);
+	exit(_exit);
+}
+
+int	sh_bltin_cd(char **cmd) {
+	char	*path;
+
+	path = 0;
+	if (!*(cmd + 1)) {
+		return (!fprintf(stderr, "cd [ PATH ] ...\n"));
+	}
+	else if (!sh_iskeyword(*(cmd + 1))) {
+		path = getenv("HOME");
+	}
+	else {
+		path = *(cmd + 1);
+	}
+	if (chdir(path) == -1) {
+		perror("cd");
+		return (0);
+	}
+	return (1);
+}
+
 int	sh_bltin_type(char **cmd) {
 	cmd++;
 	if (!(*cmd))
@@ -47,9 +82,14 @@ static void	__sh_bltin_type_loc(const char *util) {
 			}
 			_env = _endp + 1;
 		}
-		if (*_path)
+		/*	some ducktaping stuff here: 
+		 *		path on linux always starts from root ('/')
+		 *		if the path starts with other character, that means it's not a valid path
+		 *		and the utility is "unknown"
+		 * */
+		if (*_path == '/')
 			fprintf(stdout, "%s\n", _path);
 		else
-			fprintf(stdout, "(none)\n");
+			fprintf(stdout, "unknown\n");
 	}
 }

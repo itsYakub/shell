@@ -1,7 +1,7 @@
 CC		= cc
 CFLAGS	= -Wall -Wextra -Werror
 LFLAGS	= -lreadline
-SRCS	= ./shell-utils.c ./shell-parse.c ./shell-exec.c ./shell-builtin.c ./shell.c
+SRCS	= ./shell-utils.c ./shell-parse.c ./shell-exec.c ./shell-builtin.c ./shell-redirect.c ./shell.c
 OBJS	= $(SRCS:.c=.o)
 NAME	= shell
 
@@ -30,3 +30,13 @@ debug : all
 
 release : CFLAGS += -s -O3
 release : all
+
+.PHONY : install
+
+install : $(NAME)
+	cp $(NAME) /usr/local/bin
+
+.PHONY : uninstall
+
+uninstall :
+	rm -f /usr/local/bin/$(NAME)
