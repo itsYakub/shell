@@ -1,10 +1,12 @@
 #include "shell.h"
 
 void	sh_free(struct s_shell *sh) {
-	if (sh->input)
-		free(sh->input);
-	if (sh->tokens)
-		sh_free2d((void **) sh->tokens);
+	if (sh->input) {
+		free(sh->input); sh->input = 0;
+	}
+	if (sh->tokens) {
+		sh_free2d((void **) sh->tokens); sh->tokens = 0;
+	}
 }
 
 void	sh_free2d(void **ptr) {
