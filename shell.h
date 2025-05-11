@@ -25,6 +25,8 @@ struct s_shell {
 	int		pid;
 };
 
+extern char	**environ;
+
 /* shell.c */
 int		sh_init(struct s_shell *);
 int		sh_quit(struct s_shell *);
@@ -33,6 +35,7 @@ int		sh_quit(struct s_shell *);
 int		sh_execute(struct s_shell *);
 
 /* shell-parse.c */
+char	**sh_parse(struct s_shell *);
 char	**sh_lnsplt(const char *);
 bool	sh_parse_err(char **);
 
@@ -46,11 +49,18 @@ bool	sh_isbltin(const char *);
 int		sh_bltin_exit(struct s_shell *, char **);
 int		sh_bltin_cd(char **);
 int		sh_bltin_type(char **);
+int		sh_bltin_pwd(char **);
+int		sh_bltin_env(char **);
+int		sh_bltin_export(char **);
+int		sh_bltin_unset(char **);
 
 /* shell-redirect.c */
 char	**sh_handle_redirect(char **);
 void	sh_handle_input_redir(char **);
 void	sh_handle_output_redir(char **);
 void	sh_reset_redirect(struct s_shell *);
+
+/* shell-var.c */
+char	*sh_expand(struct s_shell *,const char *);
 
 #endif

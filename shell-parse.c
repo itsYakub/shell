@@ -2,6 +2,23 @@
 
 static char	*__sh_extract(const char *line, size_t *);
 
+char	**sh_parse(struct s_shell *sh) {
+	char	**_tok;
+	char	**_tok_iter;
+
+	_tok = sh_lnsplt(sh->input);
+	if (!sh_parse_err(_tok)) {
+		sh_free2d((void **) _tok);
+		return (0);
+	}
+	_tok_iter = _tok;
+	while (*_tok_iter) {
+		*_tok_iter = sh_expand(sh, *_tok_iter);
+		_tok_iter++;
+	}
+	return (_tok);
+}
+
 char	**sh_lnsplt(const char *line) {
 	char	**_arr;
 	size_t	_tok_cnt;

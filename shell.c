@@ -14,16 +14,13 @@ int main(void) {
 		signal(SIGINT, __sh_disable_ctrlc);
 		if (_sh.input) {
 			add_history(_sh.input);
-			_sh.tokens = sh_lnsplt(_sh.input);
+			_sh.tokens = sh_parse(&_sh);
 			if (_sh.tokens) {
-				if (sh_parse_err(_sh.tokens)) {
-					sh_execute(&_sh);
-				}
+				sh_execute(&_sh);
 			}
 		}
 		sh_free(&_sh);
 	}
-	rl_clear_history();
 	sh_quit(&_sh);
 	exit(0);
 }
@@ -46,6 +43,7 @@ int	sh_quit(struct s_shell *sh) {
 	dup2(sh->fd_stdin, 0); close(sh->fd_stdin);
 	dup2(sh->fd_stdout, 1); close(sh->fd_stdout);
 	sh_free(sh);
+	rl_clear_history();
 	return (1);
 }
 

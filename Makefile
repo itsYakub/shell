@@ -1,7 +1,14 @@
 CC		= cc
 CFLAGS	= -Wall -Wextra -Werror
 LFLAGS	= -lreadline
-SRCS	= ./shell-utils.c ./shell-parse.c ./shell-exec.c ./shell-builtin.c ./shell-redirect.c ./shell.c
+SRCS	= \
+	./shell-utils.c \
+	./shell-parse.c \
+	./shell-exec.c \
+	./shell-builtin.c \
+	./shell-redirect.c \
+	./shell-var.c \
+	./shell.c
 OBJS	= $(SRCS:.c=.o)
 NAME	= shell
 

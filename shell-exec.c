@@ -46,6 +46,22 @@ int	sh_execute(struct s_shell *sh) {
 			else if (!strcmp(*_cmd, "type")) {
 				sh_bltin_type(_cmd);
 			}
+			/* builtin: pwd */
+			else if (!strcmp(*_cmd, "pwd")) {
+				sh_bltin_pwd(_cmd);
+			}
+			/* builtin: env */
+			else if (!strcmp(*_cmd, "env")) {
+				sh_bltin_env(_cmd);
+			}
+			/* builtin: unset */
+			else if (!strcmp(*_cmd, "unset")) {
+				sh_bltin_unset(_cmd);
+			}
+			/* builtin: export */
+			else if (!strcmp(*_cmd, "export")) {
+				sh_bltin_export(_cmd);
+			}
 		}
 		else {
 			for (

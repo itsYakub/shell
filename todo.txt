@@ -2,13 +2,13 @@ Done:
 
 - [X] Piping;
 - [X] Single/Double - Quotes;
+- [X] Multiline commands;
+- [X] Redirection;
+- [x] Parser error-checks;
+- [x] Variable expansion;
 
 ToDo:
 
-- [X] Multiline commands;
-- [X] Redirection;
-- [ ] Parser error-checks;
-- [ ] Variable expansion;
 - [ ] pwd, env, unset as builtins;
 - [ ] Setting env-var;
 
