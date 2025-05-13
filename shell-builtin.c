@@ -6,11 +6,16 @@ bool	sh_isbltin(const char *s) {
 	return (
 		!strcmp(s, "exit")	||
 		!strcmp(s, "cd")	||
-		!strcmp(s, "type")	||
-		!strcmp(s, "pwd")	||
-		!strcmp(s, "env")	||
 		!strcmp(s, "unset")	||
 		!strcmp(s, "export")
+	);
+}
+
+bool	sh_isbltin_exec(const char *s) {
+	return (
+		!strcmp(s, "type")	||
+		!strcmp(s, "pwd")	||
+		!strcmp(s, "env")
 	);
 }
 
@@ -48,41 +53,6 @@ int	sh_bltin_cd(char **cmd) {
 	return (1);
 }
 
-int	sh_bltin_type(char **cmd) {
-	cmd++;
-	if (!(*cmd))
-		return (0);
-	if (sh_isbltin(*cmd))
-		fprintf(stdout, "%s is a shell builtin\n", *cmd);
-	else {
-		fprintf(stdout, "%s is ", *cmd);
-		__sh_bltin_type_loc(*cmd);
-	}
-	return (1);
-}
-
-int	sh_bltin_pwd(char **cmd) {
-	char	*_pwd;
-
-	(void) cmd;
-	_pwd = getenv("PWD");
-	if (!_pwd) {
-		return (!write(0, "( error )\n", 10));
-	}
-	write(0, _pwd, strlen(_pwd));
-	write(0, "\n", 1);
-	return (1);
-}
-
-int	sh_bltin_env(char **cmd) {
-	(void) cmd;
-	for (size_t i = 0; environ[i]; i++) {
-		write(0, environ[i], strlen(environ[i]));
-		write(0, "\n", 1);
-	}
-	return (1);
-}
-
 int	sh_bltin_unset(char **cmd) {
 	cmd++;
 	if (!*cmd || !sh_iskeyword(*cmd)) {
@@ -98,6 +68,44 @@ int	sh_bltin_unset(char **cmd) {
 int	sh_bltin_export(char **cmd) {
 	(void) cmd;
 	return (1);
+}
+
+int	sh_bltin_type(char **cmd) {
+	cmd++;
+	if (!(*cmd))
+		exit(1);
+	if (sh_isbltin(*cmd) || sh_isbltin_exec(*cmd)) {
+		write(1, *cmd, strlen(*cmd));
+		write(1, " is a shell builtin\n", 20);
+	}
+	else {
+		write(1, *cmd, strlen(*cmd));
+		write(1, " is ", 4);
+		__sh_bltin_type_loc(*cmd);
+	}
+	exit(0);
+}
+
+int	sh_bltin_pwd(char **cmd) {
+	char	*_pwd;
+
+	(void) cmd;
+	_pwd = getenv("PWD");
+	if (!_pwd) {
+		return (!write(1, "( error )\n", 10));
+	}
+	write(1, _pwd, strlen(_pwd));
+	write(1, "\n", 1);
+	exit(0);
+}
+
+int	sh_bltin_env(char **cmd) {
+	(void) cmd;
+	for (size_t i = 0; environ[i]; i++) {
+		write(1, environ[i], strlen(environ[i]));
+		write(1, "\n", 1);
+	}
+	exit(0);
 }
 
 static void	__sh_bltin_type_loc(const char *util) {
@@ -130,8 +138,9 @@ static void	__sh_bltin_type_loc(const char *util) {
 		 *		and the utility is "unknown"
 		 * */
 		if (*_path == '/')
-			fprintf(stdout, "%s\n", _path);
+			write(1, _path, strlen(_path));
 		else
-			fprintf(stdout, "unknown\n");
+			write(1, "unknown", 7);
+		write(1, "\n", 1);
 	}
 }

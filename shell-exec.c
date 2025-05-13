@@ -42,18 +42,6 @@ int	sh_execute(struct s_shell *sh) {
 			else if (!strcmp(*_cmd, "cd")) {
 				sh_bltin_cd(_cmd);
 			}
-			/* builtin: type */
-			else if (!strcmp(*_cmd, "type")) {
-				sh_bltin_type(_cmd);
-			}
-			/* builtin: pwd */
-			else if (!strcmp(*_cmd, "pwd")) {
-				sh_bltin_pwd(_cmd);
-			}
-			/* builtin: env */
-			else if (!strcmp(*_cmd, "env")) {
-				sh_bltin_env(_cmd);
-			}
 			/* builtin: unset */
 			else if (!strcmp(*_cmd, "unset")) {
 				sh_bltin_unset(_cmd);
@@ -104,8 +92,24 @@ static int	__sh_exec(char **av) {
 		_avcp++;
 	}
 	*_avcp = 0;
-	execvp(*av, av);
-	perror("execvp");
+	if (sh_isbltin_exec(*av)) {
+		/* builtin: type */
+		if (!strcmp(*av, "type")) {
+			sh_bltin_type(av);
+		}
+		/* builtin: pwd */
+		else if (!strcmp(*av, "pwd")) {
+			sh_bltin_pwd(av);
+		}
+		/* builtin: env */
+		else if (!strcmp(*av, "env")) {
+			sh_bltin_env(av);
+		}
+	}
+	else {
+		execvp(*av, av);
+		perror("execvp");
+	}
 	exit(1);
 }
 

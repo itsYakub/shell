@@ -46,13 +46,16 @@ bool	sh_iskeyword(const char *);
 
 /* shell-builtin.c */
 bool	sh_isbltin(const char *);
+bool	sh_isbltin_exec(const char *);
+
 int		sh_bltin_exit(struct s_shell *, char **);
 int		sh_bltin_cd(char **);
+int		sh_bltin_export(char **);
+int		sh_bltin_unset(char **);
+
 int		sh_bltin_type(char **);
 int		sh_bltin_pwd(char **);
 int		sh_bltin_env(char **);
-int		sh_bltin_export(char **);
-int		sh_bltin_unset(char **);
 
 /* shell-redirect.c */
 char	**sh_handle_redirect(char **);
