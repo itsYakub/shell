@@ -20,14 +20,24 @@ void	sh_free2d(void **ptr) {
 }
 
 bool	sh_iskeyword(const char *cmd) {
-	if (!strcmp(cmd, ";") ||
-		!strcmp(cmd, "||") ||
-		!strcmp(cmd, "|") ||
-		!strcmp(cmd, "<") ||
-		!strcmp(cmd, ">") ||
+	if (!strcmp(cmd, ";")	||
+		!strcmp(cmd, "&&")	||
+		!strcmp(cmd, "|")	||
+		!strcmp(cmd, "<")	||
+		!strcmp(cmd, ">")	||
 		!strcmp(cmd, ">>")
 	) {
 		return (false);
 	}
 	return (true);
+}
+
+bool	sh_isdelim(const char *cmd) {
+	if (!strcmp(cmd, ";")	||
+		!strcmp(cmd, "&&")	||
+		!strcmp(cmd, "|") 
+	) {
+		return (true);
+	}
+	return (false);
 }

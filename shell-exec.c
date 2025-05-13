@@ -32,6 +32,9 @@ int	sh_execute(struct s_shell *sh) {
 			}
 		}
 
+		/* Expand variables */
+		_cmd = sh_expand(sh, _cmd);
+
 		/* Command execution happens here */
 		if (sh_isbltin(*_cmd)) {
 			/* builtin: exit */
@@ -49,6 +52,14 @@ int	sh_execute(struct s_shell *sh) {
 			/* builtin: export */
 			else if (!strcmp(*_cmd, "export")) {
 				sh_bltin_export(_cmd);
+			}
+			/* builtin: ture */
+			else if (!strcmp(*_cmd, "true")) {
+				sh_bltin_true(sh);
+			}
+			/* builtin: false */
+			else if (!strcmp(*_cmd, "false")) {
+				sh_bltin_false(sh);
 			}
 		}
 		else {

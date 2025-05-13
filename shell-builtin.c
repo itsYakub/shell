@@ -4,17 +4,19 @@ static void	__sh_bltin_type_loc(const char *);
 
 bool	sh_isbltin(const char *s) {
 	return (
-		!strcmp(s, "exit")	||
-		!strcmp(s, "cd")	||
-		!strcmp(s, "unset")	||
-		!strcmp(s, "export")
+		!strcmp(s, "exit")		||
+		!strcmp(s, "cd")		||
+		!strcmp(s, "unset")		||
+		!strcmp(s, "export")	||
+		!strcmp(s, "true")		||
+		!strcmp(s, "false")
 	);
 }
 
 bool	sh_isbltin_exec(const char *s) {
 	return (
-		!strcmp(s, "type")	||
-		!strcmp(s, "pwd")	||
+		!strcmp(s, "type")		||
+		!strcmp(s, "pwd")		||
 		!strcmp(s, "env")
 	);
 }
@@ -67,6 +69,16 @@ int	sh_bltin_unset(char **cmd) {
 
 int	sh_bltin_export(char **cmd) {
 	(void) cmd;
+	return (1);
+}
+
+int	sh_bltin_true(struct s_shell *sh) {
+	sh->exit_stat = 0;
+	return (1);
+}
+
+int	sh_bltin_false(struct s_shell *sh) {
+	sh->exit_stat = 1;
 	return (1);
 }
 

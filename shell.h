@@ -43,6 +43,7 @@ bool	sh_parse_err(char **);
 void	sh_free(struct s_shell *);
 void	sh_free2d(void **);
 bool	sh_iskeyword(const char *);
+bool	sh_isdelim(const char *);
 
 /* shell-builtin.c */
 bool	sh_isbltin(const char *);
@@ -52,6 +53,8 @@ int		sh_bltin_exit(struct s_shell *, char **);
 int		sh_bltin_cd(char **);
 int		sh_bltin_export(char **);
 int		sh_bltin_unset(char **);
+int		sh_bltin_true(struct s_shell *);
+int		sh_bltin_false(struct s_shell *);
 
 int		sh_bltin_type(char **);
 int		sh_bltin_pwd(char **);
@@ -64,6 +67,6 @@ void	sh_handle_output_redir(char **);
 void	sh_reset_redirect(struct s_shell *);
 
 /* shell-var.c */
-char	*sh_expand(struct s_shell *,const char *);
+char	**sh_expand(struct s_shell *, char **);
 
 #endif

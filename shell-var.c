@@ -1,6 +1,19 @@
 #include "shell.h"
 
-char	*sh_expand(struct s_shell *sh, const char *t) {
+static char	*__sh_expand_var(struct s_shell *, const char *);
+
+char	**sh_expand(struct s_shell *sh, char **cmd) {
+	char	**_cmd;
+
+	_cmd = cmd;
+	while (*_cmd && !sh_isdelim(*_cmd)) {
+		*_cmd = __sh_expand_var(sh, *_cmd);
+		_cmd++;
+	}
+	return (cmd);
+}
+
+static char	*__sh_expand_var(struct s_shell *sh, const char *t) {
 	char	res[1024];	/* res - result */
 	char	vn[1024];	/* vn - variable name */
 	char	*ve;		/* ve - variable end */
