@@ -6,13 +6,15 @@ Done:
 - [X] Redirection;
 - [x] Parser error-checks;
 - [x] Variable expansion;
+- [x] pwd, env, unset as builtins;
+- [x] Setting env-var;
 
 ToDo:
 
-- [ ] pwd, env, unset as builtins;
-- [ ] Setting env-var;
+- [ ] rcfile;
+- [ ] startup envionment setup;
+- [ ] Status-line;
 
 Optional:
 
 - [ ] Heredoc;
-- [ ] Status-line;
