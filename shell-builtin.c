@@ -1,6 +1,7 @@
 #include "shell.h"
 
 static void	__sh_bltin_type_loc(const char *);
+static int	__sh_bltin_export_push(const char *, const char *);
 
 bool	sh_isbltin(const char *s) {
 	return (
@@ -60,16 +61,65 @@ int	sh_bltin_unset(char **cmd) {
 	if (!*cmd || !sh_iskeyword(*cmd)) {
 		return (0);
 	}
-	if (unsetenv(*cmd)) {
-		perror("unsetenv");
-		return (0);
+	while (*cmd && sh_iskeyword(*cmd)) {
+		if (unsetenv(*cmd)) {
+			perror("unsetenv");
+			return (0);
+		}
+		cmd++;
 	}
 	return (1);
 }
 
 int	sh_bltin_export(char **cmd) {
-	(void) cmd;
-	return (1);
+	char	*_key;
+	char	*_value;
+	char	*_start;
+	char	*_end;
+
+	cmd++;
+	if (!*cmd) {
+		if (!fork()) {
+			sh_bltin_env(cmd);
+		}
+		return (1);
+	}
+	if (!*(cmd + 1) || strcmp(*(cmd + 1), "|")) {
+		_key = _value = 0;
+		_start = _end = *cmd;
+		while (*_end && *_end != '=')
+			_end++;
+		_key = (char *) calloc(_end - _start, sizeof(char));
+		if (!_key) {
+			perror("calloc");
+			return (0);
+		}
+		_key = strncpy(_key, _start, _end - _start);
+		if (!*_end) {
+			if (!__sh_bltin_export_push(_key, "")) {
+				perror("setenv");
+				return (0);
+			}
+		}
+		else {
+			_start = ++_end;
+			while (*_end)
+				_end++;
+			_value = (char *) calloc(_end - _start + 1, sizeof(char));
+			if (!_value) {
+				perror("calloc");
+				free(_key);
+				return (0);
+			}
+			_value = strncpy(_value, _start, _end - _start);
+			if (!__sh_bltin_export_push(_key, _value)) {
+				perror("setenv");
+				return (0);
+			}
+		}
+		return (1);
+	}
+	return (0);
 }
 
 int	sh_bltin_true(struct s_shell *sh) {
@@ -155,4 +205,18 @@ static void	__sh_bltin_type_loc(const char *util) {
 			write(1, "unknown", 7);
 		write(1, "\n", 1);
 	}
+}
+
+static int	__sh_bltin_export_push(const char *key, const char *value) {
+	if (getenv(key)) {
+		if (setenv(key, value, 1) == -1) {
+			return (0);
+		}
+	}
+	else {
+		if (setenv(key, value, 0) == -1) {
+			return (0);
+		}
+	}
+	return (1);
 }
