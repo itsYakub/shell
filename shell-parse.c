@@ -51,7 +51,7 @@ bool	sh_parse_err(char **t) {
 	while (*t) {
 		/* check if redirection has a valid direction after the operator */
 		if (!strcmp(*t, "<") || !strcmp(*t, ">") || !strcmp(*t, ">>")) {
-			if (*(t + 1) || !sh_iskeyword(*(t + 1))) {
+			if (!*(t + 1) || !sh_iskeyword(*(t + 1))) {
 				return (!fprintf(stderr, "shell: parse error: %s\n", *t));
 			}
 		}
