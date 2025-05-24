@@ -15,7 +15,7 @@ int main(void) {
 		signal(SIGINT, __sh_disable_ctrlc);
 		if (_sh.input) {
 			add_history(_sh.input);
-			_sh.tokens = sh_parse(&_sh);
+			_sh.tokens = sh_parse(_sh.input);
 			if (_sh.tokens) {
 				sh_execute(&_sh);
 			}
@@ -38,6 +38,11 @@ int	sh_init(struct s_shell *sh) {
 
 	/* Environment setup */
 	__sh_setup_env();
+
+	/* Reading rcfile */
+	if (!sh_rc(sh)) {
+		return (0);
+	}
 	return (1);
 }
 

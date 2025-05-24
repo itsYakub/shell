@@ -8,11 +8,11 @@ Done:
 - [x] Variable expansion;
 - [x] pwd, env, unset as builtins;
 - [x] Setting env-var;
+- [X] startup envionment setup;
 
 ToDo:
 
 - [ ] rcfile;
-- [ ] startup envionment setup;
 - [ ] Status-line;
 
 Optional:

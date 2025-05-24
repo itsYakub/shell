@@ -1,7 +1,5 @@
 #include "shell.h"
 
-static int		__sh_exec(char **);
-
 static size_t	__sh_pipe_count(char **);
 
 static char		**__sh_next_pipe(char **);
@@ -73,7 +71,7 @@ int	sh_execute(struct s_shell *sh) {
 				if (!fork()) {
 					dup2(_pipefd[1], 1);
 					close(_pipefd[0]);
-					__sh_exec(_cmd);
+					sh_exec(_cmd);
 				}
 				sh_reset_redirect(sh);
 				dup2(_pipefd[0], 0);
@@ -81,7 +79,7 @@ int	sh_execute(struct s_shell *sh) {
 			}
 			_cmd = sh_handle_redirect(_cmd);
 			if (!fork()) {
-				__sh_exec(_cmd);
+				sh_exec(_cmd);
 			}
 			else {
 				while (waitpid(-1, &sh->exit_stat, WUNTRACED) >= 0) { }
@@ -93,35 +91,6 @@ int	sh_execute(struct s_shell *sh) {
 	}
 
 	return (1);
-}
-
-static int	__sh_exec(char **av) {
-	char	**_avcp;
-
-	_avcp = av;
-	while (*_avcp && sh_iskeyword(*_avcp)) {
-		_avcp++;
-	}
-	*_avcp = 0;
-	if (sh_isbltin_exec(*av)) {
-		/* builtin: type */
-		if (!strcmp(*av, "type")) {
-			sh_bltin_type(av);
-		}
-		/* builtin: pwd */
-		else if (!strcmp(*av, "pwd")) {
-			sh_bltin_pwd(av);
-		}
-		/* builtin: env */
-		else if (!strcmp(*av, "env")) {
-			sh_bltin_env(av);
-		}
-	}
-	else {
-		execvp(*av, av);
-		perror("execvp");
-	}
-	exit(1);
 }
 
 static size_t	__sh_pipe_count(char **av) {
