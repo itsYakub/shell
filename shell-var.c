@@ -13,6 +13,20 @@ char	**sh_expand(struct s_shell *sh, char **cmd) {
 	return (cmd);
 }
 
+int	sh_export(const char *key, const char *value) {
+	if (getenv(key)) {
+		if (setenv(key, value, 1) == -1) {
+			return (0);
+		}
+	}
+	else {
+		if (setenv(key, value, 0) == -1) {
+			return (0);
+		}
+	}
+	return (1);
+}
+
 static char	*__sh_expand_var(struct s_shell *sh, const char *t) {
 	char	res[1024];	/* res - result */
 	char	vn[1024];	/* vn - variable name */

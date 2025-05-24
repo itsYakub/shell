@@ -1,7 +1,6 @@
 #include "shell.h"
 
 static void	__sh_bltin_type_loc(const char *);
-static int	__sh_bltin_export_push(const char *, const char *);
 
 bool	sh_isbltin(const char *s) {
 	return (
@@ -37,21 +36,25 @@ int	sh_bltin_exit(struct s_shell *sh, char **cmd) {
 }
 
 int	sh_bltin_cd(char **cmd) {
-	char	*path;
+	char	_cwd[PATH_MAX];
+	char	*_path;
 
-	path = 0;
+	_path = 0;
 	if (!*(cmd + 1)) {
 		return (!fprintf(stderr, "cd [ PATH ] ...\n"));
 	}
 	else if (!sh_iskeyword(*(cmd + 1))) {
-		path = getenv("HOME");
+		_path = getenv("HOME");
 	}
 	else {
-		path = *(cmd + 1);
+		_path = *(cmd + 1);
 	}
-	if (chdir(path) == -1) {
+	if (chdir(_path) == -1) {
 		perror("cd");
 		return (0);
+	}
+	if (getcwd(_cwd, PATH_MAX)) {
+		sh_export("PWD", _cwd);
 	}
 	return (1);
 }
@@ -96,7 +99,7 @@ int	sh_bltin_export(char **cmd) {
 		}
 		_key = strncpy(_key, _start, _end - _start);
 		if (!*_end) {
-			if (!__sh_bltin_export_push(_key, "")) {
+			if (!sh_export(_key, "")) {
 				perror("setenv");
 				return (0);
 			}
@@ -112,7 +115,7 @@ int	sh_bltin_export(char **cmd) {
 				return (0);
 			}
 			_value = strncpy(_value, _start, _end - _start);
-			if (!__sh_bltin_export_push(_key, _value)) {
+			if (!sh_export(_key, _value)) {
 				perror("setenv");
 				return (0);
 			}
@@ -149,12 +152,16 @@ int	sh_bltin_type(char **cmd) {
 }
 
 int	sh_bltin_pwd(char **cmd) {
+	char	_cwd[PATH_MAX];
 	char	*_pwd;
 
 	(void) cmd;
 	_pwd = getenv("PWD");
 	if (!_pwd) {
-		return (!write(1, "( error )\n", 10));
+		if (!getcwd(_cwd, PATH_MAX)) {
+			return (!write(1, "( error )\n", 10));
+		}
+		_pwd = _cwd;
 	}
 	write(1, _pwd, strlen(_pwd));
 	write(1, "\n", 1);
@@ -205,18 +212,4 @@ static void	__sh_bltin_type_loc(const char *util) {
 			write(1, "unknown", 7);
 		write(1, "\n", 1);
 	}
-}
-
-static int	__sh_bltin_export_push(const char *key, const char *value) {
-	if (getenv(key)) {
-		if (setenv(key, value, 1) == -1) {
-			return (0);
-		}
-	}
-	else {
-		if (setenv(key, value, 0) == -1) {
-			return (0);
-		}
-	}
-	return (1);
 }

@@ -68,5 +68,6 @@ void	sh_reset_redirect(struct s_shell *);
 
 /* shell-var.c */
 char	**sh_expand(struct s_shell *, char **);
+int		sh_export(const char *, const char *);
 
 #endif
