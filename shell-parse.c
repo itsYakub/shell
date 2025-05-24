@@ -2,10 +2,10 @@
 
 static char	*__sh_extract(const char *line, size_t *);
 
-char	**sh_parse(struct s_shell *sh) {
+char	**sh_parse(const char *line) {
 	char	**_tok;
 	
-	_tok = sh_lnsplt(sh->input);
+	_tok = sh_lnsplt(line);
 	if (!sh_parse_err(_tok)) {
 		sh_free2d((void **) _tok);
 		return (0);

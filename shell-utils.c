@@ -41,3 +41,32 @@ bool	sh_isdelim(const char *cmd) {
 	}
 	return (false);
 }
+
+int	sh_exec(char **av) {
+	char	**_avcp;
+
+	_avcp = av;
+	while (*_avcp && sh_iskeyword(*_avcp)) {
+		_avcp++;
+	}
+	*_avcp = 0;
+	if (sh_isbltin_exec(*av)) {
+		/* builtin: type */
+		if (!strcmp(*av, "type")) {
+			sh_bltin_type(av);
+		}
+		/* builtin: pwd */
+		else if (!strcmp(*av, "pwd")) {
+			sh_bltin_pwd(av);
+		}
+		/* builtin: env */
+		else if (!strcmp(*av, "env")) {
+			sh_bltin_env(av);
+		}
+	}
+	else {
+		execvp(*av, av);
+		perror("execvp");
+	}
+	exit(1);
+}

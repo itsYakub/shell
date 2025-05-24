@@ -8,6 +8,7 @@ SRCS	= \
 	./shell-builtin.c \
 	./shell-redirect.c \
 	./shell-var.c \
+	./shell-rc.c \
 	./shell.c
 OBJS	= $(SRCS:.c=.o)
 NAME	= shell

@@ -15,7 +15,7 @@ int main(void) {
 		signal(SIGINT, __sh_disable_ctrlc);
 		if (_sh.input) {
 			add_history(_sh.input);
-			_sh.tokens = sh_parse(&_sh);
+			_sh.tokens = sh_parse(_sh.input);
 			if (_sh.tokens) {
 				sh_execute(&_sh);
 			}
@@ -38,6 +38,11 @@ int	sh_init(struct s_shell *sh) {
 
 	/* Environment setup */
 	__sh_setup_env();
+
+	/* Reading rcfile */
+	if (!sh_rc()) {
+		return (0);
+	}
 	return (1);
 }
 
@@ -45,6 +50,8 @@ int	sh_quit(struct s_shell *sh) {
 	if (!sh) {
 		return (0);
 	}
+	close(sh->fd_pipe[0]);
+	close(sh->fd_pipe[1]);
 	dup2(sh->fd_stdin, 0); close(sh->fd_stdin);
 	dup2(sh->fd_stdout, 1); close(sh->fd_stdout);
 	sh_free(sh);

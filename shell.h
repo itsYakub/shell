@@ -22,6 +22,7 @@ struct s_shell {
 	int		exit_stat;
 	int		fd_stdin;
 	int		fd_stdout;
+	int		fd_pipe[2];
 	int		pid;
 };
 
@@ -35,7 +36,7 @@ int		sh_quit(struct s_shell *);
 int		sh_execute(struct s_shell *);
 
 /* shell-parse.c */
-char	**sh_parse(struct s_shell *);
+char	**sh_parse(const char *);
 char	**sh_lnsplt(const char *);
 bool	sh_parse_err(char **);
 
@@ -44,6 +45,7 @@ void	sh_free(struct s_shell *);
 void	sh_free2d(void **);
 bool	sh_iskeyword(const char *);
 bool	sh_isdelim(const char *);
+int		sh_exec(char **);
 
 /* shell-builtin.c */
 bool	sh_isbltin(const char *);
@@ -70,5 +72,8 @@ void	sh_reset_redirect(struct s_shell *);
 char	**sh_expand(struct s_shell *, char **);
 int		sh_export(const char *, const char *);
 int		sh_exporti(const char *, int);
+
+/* shell-rc.c */
+int		sh_rc(void);
 
 #endif
