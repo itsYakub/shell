@@ -40,7 +40,7 @@ int	sh_init(struct s_shell *sh) {
 	__sh_setup_env();
 
 	/* Reading rcfile */
-	if (!sh_rc(sh)) {
+	if (!sh_rc()) {
 		return (0);
 	}
 	return (1);
@@ -50,6 +50,8 @@ int	sh_quit(struct s_shell *sh) {
 	if (!sh) {
 		return (0);
 	}
+	close(sh->fd_pipe[0]);
+	close(sh->fd_pipe[1]);
 	dup2(sh->fd_stdin, 0); close(sh->fd_stdin);
 	dup2(sh->fd_stdout, 1); close(sh->fd_stdout);
 	sh_free(sh);

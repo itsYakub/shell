@@ -7,7 +7,6 @@ static char		**__sh_next_command(char **);
 
 int	sh_execute(struct s_shell *sh) {
 	char	**_cmd;
-	int		_pipefd[2];
 
 	_cmd = sh->tokens;
 	while (*_cmd) {
@@ -66,16 +65,16 @@ int	sh_execute(struct s_shell *sh) {
 				i < pipc - 1;
 				i++, _cmd = __sh_next_pipe(_cmd)
 			) {
-				pipe(_pipefd);
+				pipe(sh->fd_pipe);
 				_cmd = sh_handle_redirect(_cmd);
 				if (!fork()) {
-					dup2(_pipefd[1], 1);
-					close(_pipefd[0]);
+					dup2(sh->fd_pipe[1], 1);
+					close(sh->fd_pipe[0]);
 					sh_exec(_cmd);
 				}
 				sh_reset_redirect(sh);
-				dup2(_pipefd[0], 0);
-				close(_pipefd[1]);
+				dup2(sh->fd_pipe[0], 0);
+				close(sh->fd_pipe[1]);
 			}
 			_cmd = sh_handle_redirect(_cmd);
 			if (!fork()) {

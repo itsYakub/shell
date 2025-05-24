@@ -22,6 +22,7 @@ struct s_shell {
 	int		exit_stat;
 	int		fd_stdin;
 	int		fd_stdout;
+	int		fd_pipe[2];
 	int		pid;
 };
 
@@ -73,6 +74,6 @@ int		sh_export(const char *, const char *);
 int		sh_exporti(const char *, int);
 
 /* shell-rc.c */
-int		sh_rc(struct s_shell *);
+int		sh_rc(void);
 
 #endif

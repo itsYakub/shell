@@ -5,16 +5,16 @@
  *	1.1. If rcfile doesn't exist, create one and exit.
  *	2. Process rcfile line by line
  *	2.1. If the first character is '#': skip
+ *	2.2. All the rest of the lines must be processed as a regular command in the command-line
  * */
 
 static char *__sh_getrcpath(void);
 static char	*__sh_getline(int);
 
-int		sh_rc(struct s_shell *sh) {
-	char	*_line;
-	int		_fd;
+int		sh_rc(void) {
+	struct s_shell	_sh;
+	int				_fd;
 
-	(void) sh;
 	/* Opening rcfile... */
 	_fd = open(__sh_getrcpath(), O_RDONLY);
 	if (_fd == -1) {
@@ -27,16 +27,29 @@ int		sh_rc(struct s_shell *sh) {
 	}
 	
 	/* ...Processing rcfile... */
-	do {
-		_line = __sh_getline(_fd);
-		if (!_line) {
+	memset(&_sh, 0, sizeof(struct s_shell));
+	_sh.fd_stdin = dup(0);
+	_sh.fd_stdout = dup(0);
+	_sh.pid = getpid();
+	while (1) {
+		_sh.input = __sh_getline(_fd);
+		if (_sh.input) {
+			_sh.tokens = sh_parse(_sh.input);
+			if (_sh.tokens) {
+				/* Comments - checking */
+				if (*(_sh.tokens[0]) != '#') {
+					sh_execute(&_sh);
+				}
+			}
+		}
+		else {
 			break;
 		}
-		printf("%s\n", _line);
-		free(_line);
-	} while (_line);
+		sh_free(&_sh);
+	}
 
 	/* ...finish */
+	sh_quit(&_sh);
 	close(_fd);
 	return (1);
 }
