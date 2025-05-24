@@ -27,6 +27,14 @@ int	sh_export(const char *key, const char *value) {
 	return (1);
 }
 
+int	sh_exporti(const char *key, int value) {
+	char	_str[128];
+
+	memset(_str, 0, sizeof(_str));
+	snprintf(_str, 128, "%i", value);
+	return (sh_export(key, _str));
+}
+
 static char	*__sh_expand_var(struct s_shell *sh, const char *t) {
 	char	res[1024];	/* res - result */
 	char	vn[1024];	/* vn - variable name */

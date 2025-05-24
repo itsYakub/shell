@@ -2,6 +2,7 @@
 
 static void	__sh_enable_ctrlc(int);
 static void	__sh_disable_ctrlc(int);
+static void	__sh_setup_env(void);
 
 int main(void) {
 	struct s_shell	_sh;
@@ -29,10 +30,14 @@ int	sh_init(struct s_shell *sh) {
 	if (!sh) {
 		return (0);
 	}
+	/* Shell object setup */
 	memset(sh, 0, sizeof(struct s_shell));
 	sh->fd_stdin = dup(0);
 	sh->fd_stdout = dup(0);
 	sh->pid = getpid();
+
+	/* Environment setup */
+	__sh_setup_env();
 	return (1);
 }
 
@@ -60,4 +65,26 @@ static void	__sh_disable_ctrlc(int sig) {
 	printf("\n");
 	rl_on_new_line();
 	rl_replace_line("", 0);
+}
+
+static void	__sh_setup_env(void) {
+	char	_cwd[PATH_MAX];
+	char	*_shlvlstr;
+	int		_shlvl;
+
+	/* Setting - up $SHLVL */
+	_shlvlstr = getenv("SHLVL");
+	if (!_shlvlstr) {
+		_shlvl = 1;
+	}
+	else {
+		_shlvl = atoi(_shlvlstr) + 1;
+	}
+	sh_exporti("SHLVL", _shlvl);
+
+	/* Setting - up $PWD */	
+	if (getcwd(_cwd, PATH_MAX)) {
+		sh_export("OLDPWD", _cwd);
+		sh_export("PWD", _cwd);
+	}
 }

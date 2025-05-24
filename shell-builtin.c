@@ -40,6 +40,7 @@ int	sh_bltin_cd(char **cmd) {
 	char	*_path;
 
 	_path = 0;
+	/* Path setup part */
 	if (!*(cmd + 1)) {
 		return (!fprintf(stderr, "cd [ PATH ] ...\n"));
 	}
@@ -48,6 +49,15 @@ int	sh_bltin_cd(char **cmd) {
 	}
 	else {
 		_path = *(cmd + 1);
+	}
+
+	/* Main builting execution:
+	 *	- set $OLDPWD variable
+	 *	- change directory
+	 *	- set $PWD variable
+	 * */
+	if (getcwd(_cwd, PATH_MAX)) {
+		sh_export("OLDPWD", _cwd);
 	}
 	if (chdir(_path) == -1) {
 		perror("cd");
