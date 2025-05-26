@@ -42,7 +42,7 @@ bool	sh_isdelim(const char *cmd) {
 	return (false);
 }
 
-int	sh_exec(char **av) {
+int	sh_exec(t_sh *sh, char **av) {
 	char	**_avcp;
 
 	_avcp = av;
@@ -53,15 +53,15 @@ int	sh_exec(char **av) {
 	if (sh_isbltin_exec(*av)) {
 		/* builtin: type */
 		if (!strcmp(*av, "type")) {
-			sh_bltin_type(av);
+			sh_bltin_type(sh, sh->tokens);
 		}
 		/* builtin: pwd */
 		else if (!strcmp(*av, "pwd")) {
-			sh_bltin_pwd(av);
+			sh_bltin_pwd(sh->tokens);
 		}
 		/* builtin: env */
 		else if (!strcmp(*av, "env")) {
-			sh_bltin_env(av);
+			sh_bltin_env(sh->tokens);
 		}
 	}
 	else {

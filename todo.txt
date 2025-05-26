@@ -4,15 +4,17 @@ Done:
 - [X] Single/Double - Quotes;
 - [X] Multiline commands;
 - [X] Redirection;
-- [x] Parser error-checks;
-- [x] Variable expansion;
-- [x] pwd, env, unset as builtins;
-- [x] Setting env-var;
+- [X] Parser error-checks;
+- [X] Variable expansion;
+- [X] pwd, env, unset as builtins;
+- [X] Setting env-var;
 - [X] startup envionment setup;
+- [X] rcfile;
 
 ToDo:
 
-- [ ] rcfile;
+- [X] alias;
+- [X] unalias;
 - [ ] Status-line;
 
 Optional:

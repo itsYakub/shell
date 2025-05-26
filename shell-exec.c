@@ -5,7 +5,7 @@ static size_t	__sh_pipe_count(char **);
 static char		**__sh_next_pipe(char **);
 static char		**__sh_next_command(char **);
 
-int	sh_execute(struct s_shell *sh) {
+int	sh_execute(t_sh *sh) {
 	char	**_cmd;
 
 	_cmd = sh->tokens;
@@ -50,6 +50,14 @@ int	sh_execute(struct s_shell *sh) {
 			else if (!strcmp(*_cmd, "export")) {
 				sh_bltin_export(_cmd);
 			}
+			/* builtin: alias */
+			else if (!strcmp(*_cmd, "alias")) {
+				sh_bltin_alias(sh, _cmd);
+			}
+			/* builtin: unalias */
+			else if (!strcmp(*_cmd, "unalias")) {
+				sh_bltin_unalias(sh, _cmd);
+			}
 			/* builtin: ture */
 			else if (!strcmp(*_cmd, "true")) {
 				sh_bltin_true(sh);
@@ -70,7 +78,7 @@ int	sh_execute(struct s_shell *sh) {
 				if (!fork()) {
 					dup2(sh->fd_pipe[1], 1);
 					close(sh->fd_pipe[0]);
-					sh_exec(_cmd);
+					sh_exec(sh, _cmd);
 				}
 				sh_reset_redirect(sh);
 				dup2(sh->fd_pipe[0], 0);
@@ -78,7 +86,7 @@ int	sh_execute(struct s_shell *sh) {
 			}
 			_cmd = sh_handle_redirect(_cmd);
 			if (!fork()) {
-				sh_exec(_cmd);
+				sh_exec(sh, _cmd);
 			}
 			else {
 				while (waitpid(-1, &sh->exit_stat, WUNTRACED) >= 0) { }

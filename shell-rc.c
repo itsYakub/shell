@@ -10,8 +10,9 @@
 
 static char *__sh_getrcpath(void);
 static char	*__sh_getline(int);
+static int	__sh_rc_quit(t_sh *);
 
-int		sh_rc(void) {
+int		sh_rc(t_sh *sh) {
 	struct s_shell	_sh;
 	int				_fd;
 
@@ -34,7 +35,7 @@ int		sh_rc(void) {
 	while (1) {
 		_sh.input = __sh_getline(_fd);
 		if (_sh.input) {
-			_sh.tokens = sh_parse(_sh.input);
+			_sh.tokens = sh_parse(_sh.input, &_sh);
 			if (_sh.tokens) {
 				/* Comments - checking */
 				if (*(_sh.tokens[0]) != '#') {
@@ -49,7 +50,8 @@ int		sh_rc(void) {
 	}
 
 	/* ...finish */
-	sh_quit(&_sh);
+	__sh_rc_quit(&_sh);
+	sh->aliases = _sh.aliases;
 	close(_fd);
 	return (1);
 }
@@ -100,4 +102,17 @@ static char	*__sh_getline(int fd) {
 		lseek(fd, 1, SEEK_CUR);
 	}
 	return (_fstr);
+}
+
+static int	__sh_rc_quit(t_sh *sh) {
+	if (!sh) {
+		return (0);
+	}
+	close(sh->fd_pipe[0]);
+	close(sh->fd_pipe[1]);
+	dup2(sh->fd_stdin, 0); close(sh->fd_stdin);
+	dup2(sh->fd_stdout, 1); close(sh->fd_stdout);
+	sh_free(sh);
+	rl_clear_history();
+	return (1);
 }
