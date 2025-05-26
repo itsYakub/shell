@@ -10,11 +10,11 @@ Done:
 - [X] Setting env-var;
 - [X] startup envionment setup;
 - [X] rcfile;
+- [X] alias;
+- [X] unalias;
 
 ToDo:
 
-- [X] alias;
-- [X] unalias;
 - [ ] Status-line;
 
 Optional:
