@@ -16,7 +16,16 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 
+struct s_kvll {
+	void			*key;
+	void			*value;
+	struct s_kvll	*next;
+};
+
+typedef struct s_kvll	t_kvll;
+
 struct s_shell {
+	t_kvll	*aliases;
 	char	**tokens;
 	char	*input;
 	int		exit_stat;
@@ -26,39 +35,43 @@ struct s_shell {
 	int		pid;
 };
 
+typedef struct s_shell	t_sh;
+
 extern char	**environ;
 
 /* shell.c */
-int		sh_init(struct s_shell *);
-int		sh_quit(struct s_shell *);
+int		sh_init(t_sh *);
+int		sh_quit(t_sh *);
 
 /* shell-exec.c */
-int		sh_execute(struct s_shell *);
+int		sh_execute(t_sh *);
 
 /* shell-parse.c */
-char	**sh_parse(const char *);
-char	**sh_lnsplt(const char *);
+char	**sh_parse(const char *, t_sh *);
+char	**sh_lnsplt(const char *, size_t *);
 bool	sh_parse_err(char **);
 
 /* shell-utils.c */
-void	sh_free(struct s_shell *);
+void	sh_free(t_sh *);
 void	sh_free2d(void **);
 bool	sh_iskeyword(const char *);
 bool	sh_isdelim(const char *);
-int		sh_exec(char **);
+int		sh_exec(t_sh *, char **);
 
 /* shell-builtin.c */
 bool	sh_isbltin(const char *);
 bool	sh_isbltin_exec(const char *);
 
-int		sh_bltin_exit(struct s_shell *, char **);
+int		sh_bltin_exit(t_sh *, char **);
 int		sh_bltin_cd(char **);
 int		sh_bltin_export(char **);
 int		sh_bltin_unset(char **);
-int		sh_bltin_true(struct s_shell *);
-int		sh_bltin_false(struct s_shell *);
+int		sh_bltin_alias(t_sh *, char **);
+int		sh_bltin_unalias(t_sh *, char **);
+int		sh_bltin_true(t_sh *);
+int		sh_bltin_false(t_sh *);
 
-int		sh_bltin_type(char **);
+int		sh_bltin_type(t_sh *, char **);
 int		sh_bltin_pwd(char **);
 int		sh_bltin_env(char **);
 
@@ -69,11 +82,31 @@ void	sh_handle_output_redir(char **);
 void	sh_reset_redirect(struct s_shell *);
 
 /* shell-var.c */
-char	**sh_expand(struct s_shell *, char **);
+char	**sh_expand(t_sh *, char **);
 int		sh_export(const char *, const char *);
 int		sh_exporti(const char *, int);
 
 /* shell-rc.c */
-int		sh_rc(void);
+int		sh_rc(t_sh *);
+
+/* shell-kvll.c */
+t_kvll	*sh_kvll(void *, void *);
+t_kvll	*sh_kvll_get(t_kvll *, void *);
+t_kvll	*sh_kvll_last(t_kvll *);
+void	*sh_kvll_value(t_kvll *, void *);
+size_t	sh_kvll_size(t_kvll *);
+int		sh_kvll_push(t_kvll **, t_kvll *);
+int		sh_kvll_pop(t_kvll **, void *);
+int		sh_kvll_pop_front(t_kvll **);
+int		sh_kvll_pop_back(t_kvll **);
+int		sh_kvll_dup(t_kvll **, t_kvll *);
+int		sh_kvll_clear(t_kvll *);
+int		sh_kvll_free(t_kvll *);
+
+/* shell-alias.c */
+char	**sh_alias_extract(t_sh *, const char *, size_t *);
+bool	sh_alias_exist(t_sh *, const char *);
+int		sh_alias_export(t_sh *, const char *, const char *);
+int		sh_alias_clear(t_sh *);
 
 #endif

@@ -1,8 +1,8 @@
 #include "shell.h"
 
-static char	*__sh_expand_var(struct s_shell *, const char *);
+static char	*__sh_expand_var(t_sh *, const char *);
 
-char	**sh_expand(struct s_shell *sh, char **cmd) {
+char	**sh_expand(t_sh *sh, char **cmd) {
 	char	**_cmd;
 
 	_cmd = cmd;

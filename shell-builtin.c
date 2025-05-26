@@ -6,8 +6,10 @@ bool	sh_isbltin(const char *s) {
 	return (
 		!strcmp(s, "exit")		||
 		!strcmp(s, "cd")		||
-		!strcmp(s, "unset")		||
 		!strcmp(s, "export")	||
+		!strcmp(s, "unset")		||
+		!strcmp(s, "alias")		||
+		!strcmp(s, "unalias")	||
 		!strcmp(s, "true")		||
 		!strcmp(s, "false")
 	);
@@ -21,7 +23,7 @@ bool	sh_isbltin_exec(const char *s) {
 	);
 }
 
-int	sh_bltin_exit(struct s_shell *sh, char **cmd) {
+int	sh_bltin_exit(t_sh *sh, char **cmd) {
 	int	_exit;
 
 	if (*(cmd + 1) && sh_iskeyword(*(cmd + 1))) {
@@ -65,21 +67,6 @@ int	sh_bltin_cd(char **cmd) {
 	}
 	if (getcwd(_cwd, PATH_MAX)) {
 		sh_export("PWD", _cwd);
-	}
-	return (1);
-}
-
-int	sh_bltin_unset(char **cmd) {
-	cmd++;
-	if (!*cmd || !sh_iskeyword(*cmd)) {
-		return (0);
-	}
-	while (*cmd && sh_iskeyword(*cmd)) {
-		if (unsetenv(*cmd)) {
-			perror("unsetenv");
-			return (0);
-		}
-		cmd++;
 	}
 	return (1);
 }
@@ -135,23 +122,72 @@ int	sh_bltin_export(char **cmd) {
 	return (0);
 }
 
-int	sh_bltin_true(struct s_shell *sh) {
+int	sh_bltin_unset(char **cmd) {
+	cmd++;
+	if (!*cmd || !sh_iskeyword(*cmd)) {
+		return (0);
+	}
+	while (*cmd && sh_iskeyword(*cmd)) {
+		if (unsetenv(*cmd)) {
+			perror("unsetenv");
+			return (0);
+		}
+		cmd++;
+	}
+	return (1);
+}
+
+int	sh_bltin_alias(t_sh *sh, char **cmd) {
+	t_kvll	*_head;
+	
+	cmd++;
+	if (
+		!*cmd ||
+		!sh_iskeyword(*cmd) ||
+		!*(cmd + 1) ||
+		!sh_iskeyword(*(cmd + 1))
+	) {
+		_head = sh->aliases;
+		while(_head) {
+			printf("%s=\"%s\"\n", (const char *) _head->key, (const char *) _head->value);
+			_head = _head->next;
+		}
+		return (1);
+	}
+	return (sh_alias_export(sh, strdup(*cmd), strdup(*(cmd + 1))));
+}
+
+int	sh_bltin_unalias(t_sh *sh, char **cmd) {
+	cmd++;
+	if (!*cmd || !sh_iskeyword(*cmd)) {
+		return (!write(2, "unalias [ ALIAS-NAME ]\n", 23));
+	}
+	return (sh_kvll_pop(&sh->aliases, *cmd));
+}
+
+int	sh_bltin_true(t_sh *sh) {
 	sh->exit_stat = 0;
 	return (1);
 }
 
-int	sh_bltin_false(struct s_shell *sh) {
+int	sh_bltin_false(t_sh *sh) {
 	sh->exit_stat = 1;
 	return (1);
 }
 
-int	sh_bltin_type(char **cmd) {
+int	sh_bltin_type(t_sh *sh, char **cmd) {
 	cmd++;
 	if (!(*cmd))
 		exit(1);
 	if (sh_isbltin(*cmd) || sh_isbltin_exec(*cmd)) {
 		write(1, *cmd, strlen(*cmd));
 		write(1, " is a shell builtin\n", 20);
+	}
+	else if (sh_alias_exist(sh, *cmd)) {
+		write(1, *cmd, strlen(*cmd));
+		write(1, " is aliased to '", 16);
+		write(1, sh_kvll_value(sh->aliases, *cmd), strlen(sh_kvll_value(sh->aliases, *cmd)));
+		write(1, "'\n", 2);
 	}
 	else {
 		write(1, *cmd, strlen(*cmd));

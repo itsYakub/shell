@@ -5,7 +5,7 @@ static void	__sh_disable_ctrlc(int);
 static void	__sh_setup_env(void);
 
 int main(void) {
-	struct s_shell	_sh;
+	t_sh	_sh;
 
 	sh_init(&_sh);
 	while (1) {
@@ -15,7 +15,7 @@ int main(void) {
 		signal(SIGINT, __sh_disable_ctrlc);
 		if (_sh.input) {
 			add_history(_sh.input);
-			_sh.tokens = sh_parse(_sh.input);
+			_sh.tokens = sh_parse(_sh.input, &_sh);
 			if (_sh.tokens) {
 				sh_execute(&_sh);
 			}
@@ -26,7 +26,7 @@ int main(void) {
 	exit(0);
 }
 
-int	sh_init(struct s_shell *sh) {
+int	sh_init(t_sh *sh) {
 	if (!sh) {
 		return (0);
 	}
@@ -40,13 +40,13 @@ int	sh_init(struct s_shell *sh) {
 	__sh_setup_env();
 
 	/* Reading rcfile */
-	if (!sh_rc()) {
+	if (!sh_rc(sh)) {
 		return (0);
 	}
 	return (1);
 }
 
-int	sh_quit(struct s_shell *sh) {	
+int	sh_quit(t_sh *sh) {	
 	if (!sh) {
 		return (0);
 	}
@@ -55,7 +55,7 @@ int	sh_quit(struct s_shell *sh) {
 	dup2(sh->fd_stdin, 0); close(sh->fd_stdin);
 	dup2(sh->fd_stdout, 1); close(sh->fd_stdout);
 	sh_free(sh);
-	rl_clear_history();
+	sh_alias_clear(sh);
 	return (1);
 }
 
