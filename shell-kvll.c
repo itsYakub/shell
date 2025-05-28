@@ -13,6 +13,23 @@ t_kvll	*sh_kvll(void *key, void *value) {
 	return (_ll);
 }
 
+t_kvll	*sh_kvll_dup(t_kvll *ll) {
+	t_kvll	*_head;
+	t_kvll	*_tmp;
+
+	_head = sh_kvll(ll->key, ll->value);
+	_tmp = _head;
+	while (ll) {
+		ll = ll->next;
+		if (!ll) {
+			break;
+		}
+		_tmp->next = sh_kvll(ll->key, ll->value);
+		_tmp = _tmp->next;
+	}
+	return (_head);
+}
+
 t_kvll	*sh_kvll_get(t_kvll *ll, void *key) {
 	t_kvll	*_head;
 

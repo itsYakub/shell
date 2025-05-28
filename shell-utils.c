@@ -19,6 +19,15 @@ void	sh_free2d(void **ptr) {
 		free(ptr);
 }
 
+void	sh_close_fds(t_sh *sh) {
+	close(sh->fd_pipe[0]);
+	close(sh->fd_pipe[1]);
+	close(sh->fd_null);
+	close(sh->fd_curin);
+	dup2(sh->fd_stdin, 0); close(sh->fd_stdin);
+	dup2(sh->fd_stdout, 1); close(sh->fd_stdout);
+}
+
 bool	sh_iskeyword(const char *cmd) {
 	if (!strcmp(cmd, ";")	||
 		!strcmp(cmd, "&&")	||
@@ -69,4 +78,43 @@ int	sh_exec(t_sh *sh, char **av) {
 		perror("execvp");
 	}
 	exit(1);
+}
+
+char	*sh_getline(int fd) {
+	char	*_tmp;
+	char	*_dst;
+	char	_c;
+
+	_dst = _tmp = 0;
+	_c = 0;
+	if (read(fd, 0, 0) != -1) {
+		read(fd, &_c, 1);
+		if (!_c || _c == EOF) {
+			return (0);
+		}
+		_dst = calloc(1, sizeof(char));
+		if (!_dst) {
+			perror("calloc");
+			return (0);
+		}
+		do {
+			_tmp = _dst;
+			_dst = sh_strjoinc(_dst, _c);
+			free(_tmp);
+		} while (read(fd, &_c, 1) && _c != 0 && _c != '\n');
+	}
+	return (_dst);
+}
+
+char	*sh_strjoinc(char *s0, char c) {
+	char	*_s;
+
+	_s = (char *) calloc(strlen(s0) + 2, sizeof(char));
+	if (!_s) {
+		perror("calloc");
+		return (0);
+	}
+	_s = strcat(_s, s0);
+	_s = strncat(_s, &c, 1);
+	return (_s);
 }

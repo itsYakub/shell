@@ -29,8 +29,10 @@ struct s_shell {
 	char	**tokens;
 	char	*input;
 	int		exit_stat;
+	int		fd_curin;
 	int		fd_stdin;
 	int		fd_stdout;
+	int		fd_null;
 	int		fd_pipe[2];
 	int		pid;
 };
@@ -41,7 +43,11 @@ extern char	**environ;
 
 /* shell.c */
 int		sh_init(t_sh *);
+int		sh_init_struct(t_sh *);
+int		sh_init_env(void);
+int		sh_loop(t_sh *, bool);
 int		sh_quit(t_sh *);
+int		sh_input(t_sh *);
 
 /* shell-exec.c */
 int		sh_execute(t_sh *);
@@ -54,9 +60,12 @@ bool	sh_parse_err(char **);
 /* shell-utils.c */
 void	sh_free(t_sh *);
 void	sh_free2d(void **);
+void	sh_close_fds(t_sh *);
 bool	sh_iskeyword(const char *);
 bool	sh_isdelim(const char *);
 int		sh_exec(t_sh *, char **);
+char	*sh_getline(int);
+char	*sh_strjoinc(char *, char);
 
 /* shell-builtin.c */
 bool	sh_isbltin(const char *);
@@ -91,6 +100,7 @@ int		sh_rc(t_sh *);
 
 /* shell-kvll.c */
 t_kvll	*sh_kvll(void *, void *);
+t_kvll	*sh_kvll_dup(t_kvll *);
 t_kvll	*sh_kvll_get(t_kvll *, void *);
 t_kvll	*sh_kvll_last(t_kvll *);
 void	*sh_kvll_value(t_kvll *, void *);
@@ -99,7 +109,6 @@ int		sh_kvll_push(t_kvll **, t_kvll *);
 int		sh_kvll_pop(t_kvll **, void *);
 int		sh_kvll_pop_front(t_kvll **);
 int		sh_kvll_pop_back(t_kvll **);
-int		sh_kvll_dup(t_kvll **, t_kvll *);
 int		sh_kvll_clear(t_kvll *);
 int		sh_kvll_free(t_kvll *);
 
