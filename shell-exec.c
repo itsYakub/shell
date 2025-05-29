@@ -77,7 +77,10 @@ int	sh_execute(t_sh *sh) {
 				i < pipc - 1;
 				i++, _cmd = __sh_next_pipe(_cmd)
 			) {
-				pipe(sh->fd_pipe);
+				if (pipe(sh->fd_pipe) == -1) {
+					perror("pipe");
+					break;
+				}
 				_cmd = sh_handle_redirect(_cmd);
 				if (!fork()) {
 					dup2(sh->fd_pipe[1], 1);

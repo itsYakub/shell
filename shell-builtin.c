@@ -45,7 +45,7 @@ int	sh_bltin_cd(char **cmd) {
 	_path = 0;
 	/* Path setup part */
 	if (!*(cmd + 1)) {
-		return (!fprintf(stderr, "cd [ PATH ] ...\n"));
+		return (!printf("cd [ PATH ] ...\n"));
 	}
 	else if (!sh_iskeyword(*(cmd + 1))) {
 		_path = getenv("HOME");
@@ -161,7 +161,7 @@ int	sh_bltin_alias(t_sh *sh, char **cmd) {
 int	sh_bltin_unalias(t_sh *sh, char **cmd) {
 	cmd++;
 	if (!*cmd || !sh_iskeyword(*cmd)) {
-		return (!write(2, "unalias [ ALIAS-NAME ]\n", 23));
+		return (!printf("unalias [ ALIAS-NAME ]\n"));
 	}
 	return (sh_kvll_pop(&sh->aliases, *cmd));
 }
@@ -198,18 +198,13 @@ int	sh_bltin_type(t_sh *sh, char **cmd) {
 	if (!(*cmd))
 		exit(1);
 	if (sh_isbltin(*cmd) || sh_isbltin_exec(*cmd)) {
-		write(1, *cmd, strlen(*cmd));
-		write(1, " is a shell builtin\n", 20);
+		printf("%s is a shell builtin\n", *cmd);
 	}
 	else if (sh_alias_exist(sh, *cmd)) {
-		write(1, *cmd, strlen(*cmd));
-		write(1, " is aliased to '", 16);
-		write(1, sh_kvll_value(sh->aliases, *cmd), strlen(sh_kvll_value(sh->aliases, *cmd)));
-		write(1, "'\n", 2);
+		printf("%s is aliased to \'%s\'\n", *cmd, (const char *) sh_kvll_value(sh->aliases, *cmd));
 	}
 	else {
-		write(1, *cmd, strlen(*cmd));
-		write(1, " is ", 4);
+		printf("%s is ", *cmd);
 		__sh_bltin_type_loc(*cmd);
 	}
 	exit(0);
@@ -223,20 +218,18 @@ int	sh_bltin_pwd(char **cmd) {
 	_pwd = getenv("PWD");
 	if (!_pwd) {
 		if (!getcwd(_cwd, PATH_MAX)) {
-			return (!write(1, "( error )\n", 10));
+			return (!printf("( error )\n"));
 		}
 		_pwd = _cwd;
 	}
-	write(1, _pwd, strlen(_pwd));
-	write(1, "\n", 1);
+	printf("%s\n", _pwd);
 	exit(0);
 }
 
 int	sh_bltin_env(char **cmd) {
 	(void) cmd;
 	for (size_t i = 0; environ[i]; i++) {
-		write(1, environ[i], strlen(environ[i]));
-		write(1, "\n", 1);
+		printf("%s\n", environ[i]);
 	}
 	exit(0);
 }
@@ -271,9 +264,8 @@ static void	__sh_bltin_type_loc(const char *util) {
 		 *		and the utility is "unknown"
 		 * */
 		if (*_path == '/')
-			write(1, _path, strlen(_path));
+			printf("%s\n", _path);
 		else
-			write(1, "unknown", 7);
-		write(1, "\n", 1);
+			printf("( null )\n");
 	}
 }

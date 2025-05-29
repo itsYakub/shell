@@ -33,7 +33,7 @@ int	sh_init(t_sh *sh) {
 	}
 
 	/* Reading rcfile */
-	if (!sh_rc(sh, "/home/yakub/.shrc")) {
+	if (!sh_rc(sh, sh_rc_local())) {
 		return (0);
 	}
 	return (1);

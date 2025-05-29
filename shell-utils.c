@@ -1,4 +1,5 @@
 #include "shell.h"
+#include <sys/param.h>
 
 void	sh_free(struct s_shell *sh) {
 	if (sh->input) {
@@ -89,7 +90,9 @@ char	*sh_getline(int fd) {
 	_dst = _tmp = 0;
 	_c = 0;
 	if (read(fd, 0, 0) != -1) {
-		read(fd, &_c, 1);
+		if (read(fd, &_c, 1) == -1) {
+			return (0);
+		}
 		if (!_c || _c == EOF) {
 			return (0);
 		}
@@ -116,6 +119,7 @@ char	*sh_strjoinc(char *s0, char c) {
 		return (0);
 	}
 	_s = strcat(_s, s0);
-	_s = strncat(_s, &c, 1);
+	_s[strlen(_s)] = c;
+	_s[strlen(_s)] = 0;
 	return (_s);
 }

@@ -117,6 +117,7 @@ int	sh_kvll_pop_back(t_kvll **ll) {
 	if (!ll)
 		return (0);
 	_lsiz = sh_kvll_size(*ll);
+	_last = 0;
 	while (_lsiz--) {
 		_last = _last->next;
 	}

@@ -100,6 +100,7 @@ int		sh_exporti(const char *, int);
 
 /* shell-rc.c */
 int		sh_rc(t_sh *, const char *);
+char	*sh_rc_local(void);
 
 /* shell-kvll.c */
 t_kvll	*sh_kvll(void *, void *);

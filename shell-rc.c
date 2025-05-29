@@ -34,3 +34,13 @@ int		sh_rc(t_sh *sh, const char *fp) {
 	sh_close_fds(&_sh);
 	return (1);
 }
+
+char	*sh_rc_local(void) {
+	static char	_s[PATH_MAX];
+
+	memset(_s, 0, PATH_MAX);
+	strcat(_s, "/home/");
+	strcat(_s, getenv("USER"));
+	strcat(_s, "/.shrc");
+	return (_s);
+}
