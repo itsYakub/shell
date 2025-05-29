@@ -11,7 +11,8 @@ bool	sh_isbltin(const char *s) {
 		!strcmp(s, "alias")		||
 		!strcmp(s, "unalias")	||
 		!strcmp(s, "true")		||
-		!strcmp(s, "false")
+		!strcmp(s, "false")		||
+		!strcmp(s, "statusline")
 	);
 }
 
@@ -172,6 +173,23 @@ int	sh_bltin_true(t_sh *sh) {
 
 int	sh_bltin_false(t_sh *sh) {
 	sh->exit_stat = 1;
+	return (1);
+}
+
+int	sh_bltin_statusline(t_sh *sh, char **cmd) {
+	cmd++;
+	if (!*cmd || !sh_iskeyword(*cmd)) {
+		printf("\"%s\"\n", sh->statusline);
+		return (1);
+	}
+	if (sh->statusline) {
+		free(sh->statusline); sh->statusline = 0;
+	}
+	sh->statusline = strdup(*cmd);
+	if (!sh->statusline) {
+		perror("strdup");
+		return (0);
+	}
 	return (1);
 }
 

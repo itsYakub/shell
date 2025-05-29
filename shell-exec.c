@@ -66,6 +66,10 @@ int	sh_execute(t_sh *sh) {
 			else if (!strcmp(*_cmd, "false")) {
 				sh_bltin_false(sh);
 			}
+			/* builtin: statusline */
+			else if (!strcmp(*_cmd, "statusline")) {
+				sh_bltin_statusline(sh, _cmd);
+			}
 		}
 		else {
 			for (

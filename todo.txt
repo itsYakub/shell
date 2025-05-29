@@ -12,10 +12,11 @@ Done:
 - [X] rcfile;
 - [X] alias;
 - [X] unalias;
+- [X] Status-line;
 
 ToDo:
 
-- [ ] Status-line;
+- [ ] Advanced completion engine;
 
 Optional:
 

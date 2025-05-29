@@ -13,8 +13,9 @@ void	sh_free2d(void **ptr) {
 	void	**_ptr;
 
 	_ptr = ptr;
-	while (*_ptr)
+	while (*_ptr) {
 		free(*_ptr++);
+	}
 	if (ptr)
 		free(ptr);
 }

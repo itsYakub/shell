@@ -8,18 +8,14 @@
  *	2.2. All the rest of the lines must be processed as a regular command in the command-line
  * */
 
-static char *__sh_getrcpath(void);
-
-int		sh_rc(t_sh *sh) {
+int		sh_rc(t_sh *sh, const char *fp) {
 	t_sh	_sh;
 
-	/* Processing rcfile... */
 	sh_init_struct(&_sh);
-	
 	/* ...Opening dotfile... */
-	_sh.fd_curin = open(__sh_getrcpath(), O_RDONLY);
+	_sh.fd_curin = open(fp, O_RDONLY);
 	if (_sh.fd_curin == -1) {
-		_sh.fd_curin = open(__sh_getrcpath(), O_RDWR | O_CREAT, 0664);
+		_sh.fd_curin = open(fp, O_RDWR | O_CREAT, 0664);
 		if (_sh.fd_curin == -1) {
 			perror("open");
 			return (0);
@@ -32,15 +28,9 @@ int		sh_rc(t_sh *sh) {
 	
 	/* ...finish */
 	sh->aliases = _sh.aliases;
+	sh->statusline = strdup(_sh.statusline);
+	free(_sh.statusline);
 	sh_free(&_sh);
 	sh_close_fds(&_sh);
 	return (1);
-}
-
-static char *__sh_getrcpath(void) {
-	static char	_path[PATH_MAX];
-
-	strcat(_path, getenv("HOME"));
-	strcat(_path, "/.shrc");
-	return (_path);
 }

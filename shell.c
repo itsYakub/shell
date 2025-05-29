@@ -33,7 +33,7 @@ int	sh_init(t_sh *sh) {
 	}
 
 	/* Reading rcfile */
-	if (!sh_rc(sh)) {
+	if (!sh_rc(sh, "/home/yakub/.shrc")) {
 		return (0);
 	}
 	return (1);
@@ -92,7 +92,7 @@ int	sh_loop(t_sh *sh, bool silent) {
 			dup2(sh->fd_stdout, 1);
 		}
 		else {
-			sh->input = readline("$ ");
+			sh->input = readline(sh_statusline(sh));
 		}
 		signal(SIGINT, __sh_disable_ctrlc);
 		if (sh->input) {
@@ -123,6 +123,7 @@ int	sh_quit(t_sh *sh) {
 	sh_free(sh);
 	sh_close_fds(sh);
 	sh_alias_clear(sh);
+	free(sh->statusline);
 	return (1);
 }
 

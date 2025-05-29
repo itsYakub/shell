@@ -13,6 +13,7 @@
 # include <unistd.h>
 # include <sys/wait.h>
 # include <sys/param.h>
+# include <sys/utsname.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 
@@ -28,13 +29,14 @@ struct s_shell {
 	t_kvll	*aliases;
 	char	**tokens;
 	char	*input;
+	char	*statusline;
 	int		exit_stat;
 	int		fd_curin;
 	int		fd_stdin;
 	int		fd_stdout;
 	int		fd_null;
-	int		fd_pipe[2];
 	int		pid;
+	int		fd_pipe[2];
 };
 
 typedef struct s_shell	t_sh;
@@ -79,6 +81,7 @@ int		sh_bltin_alias(t_sh *, char **);
 int		sh_bltin_unalias(t_sh *, char **);
 int		sh_bltin_true(t_sh *);
 int		sh_bltin_false(t_sh *);
+int		sh_bltin_statusline(t_sh *, char **);
 
 int		sh_bltin_type(t_sh *, char **);
 int		sh_bltin_pwd(char **);
@@ -96,7 +99,7 @@ int		sh_export(const char *, const char *);
 int		sh_exporti(const char *, int);
 
 /* shell-rc.c */
-int		sh_rc(t_sh *);
+int		sh_rc(t_sh *, const char *);
 
 /* shell-kvll.c */
 t_kvll	*sh_kvll(void *, void *);
@@ -117,5 +120,8 @@ char	**sh_alias_extract(t_sh *, const char *, size_t *);
 bool	sh_alias_exist(t_sh *, const char *);
 int		sh_alias_export(t_sh *, const char *, const char *);
 int		sh_alias_clear(t_sh *);
+
+/* shell-statusline.c */
+char	*sh_statusline(t_sh *);
 
 #endif

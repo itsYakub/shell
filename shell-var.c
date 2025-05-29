@@ -1,14 +1,18 @@
 #include "shell.h"
 
-static char	*__sh_expand_var(t_sh *, const char *);
+static char	*__sh_expstr(struct s_shell *, const char *);
 
-char	**sh_expand(t_sh *sh, char **cmd) {
-	char	**_cmd;
+	char	**sh_expand(t_sh *sh, char **cmd) {
+	char	*_tmp;
 
-	_cmd = cmd;
-	while (*_cmd && !sh_isdelim(*_cmd)) {
-		*_cmd = __sh_expand_var(sh, *_cmd);
-		_cmd++;
+	for (size_t i = 0; cmd[i] && !sh_isdelim(cmd[i]); i++) {
+		_tmp = cmd[i];
+		if (strcmp(cmd[i > 0 ? i-1 : 0], "statusline")) {
+			cmd[i] = __sh_expstr(sh, cmd[i]);
+			if (cmd[i] != _tmp) {
+				free(_tmp);
+			}
+		}
 	}
 	return (cmd);
 }
@@ -35,7 +39,7 @@ int	sh_exporti(const char *key, int value) {
 	return (sh_export(key, _str));
 }
 
-static char	*__sh_expand_var(struct s_shell *sh, const char *t) {
+static char	*__sh_expstr(struct s_shell *sh, const char *t) {
 	char	res[1024];	/* res - result */
 	char	vn[1024];	/* vn - variable name */
 	char	*ve;		/* ve - variable end */
@@ -87,6 +91,5 @@ static char	*__sh_expand_var(struct s_shell *sh, const char *t) {
 		e = strchr(s, '$');
 	}
 	strcat(res, s);
-	free((void *) t);
 	return (strdup(res));
 }
