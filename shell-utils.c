@@ -123,3 +123,71 @@ char	*sh_strjoinc(char *s0, char c) {
 	_s[strlen(_s)] = 0;
 	return (_s);
 }
+
+char	*sh_expstr(struct s_shell *sh, const char *t) {
+	char	_result[1024];
+	char	_varname[1024];
+	char	*_varend;
+	char	*_start;
+	char	*_end;
+
+	memset(_varname, 0, sizeof(_varname));
+	memset(_result, 0, sizeof(_result));
+	_start = (char *) t;
+	_end = strchr(_start, '$');
+	if (_end) {
+		while (_end) {
+			if (_end - _start) {
+				strncat(_result, _start, _end - _start);
+			}
+			_start = _end + 1;
+			if (isalpha(*_start)) {
+				_varend = _start;
+				while (isalnum(*_varend)) {
+					_varend++;
+				}
+				strncpy(_varname, _start, _varend - _start);
+				if (getenv(_varname)) {
+					strcat(_result, getenv(_varname));
+				}
+				_start = _varend;
+			}
+			else if (
+				*_start == '?' ||
+				*_start == '$'
+			) {
+				char	_s[128];
+			
+				memset(_s, 0, sizeof(_s));
+				if (*_start == '?') {
+					sprintf(_s, "%i", sh->exit_stat);
+				}
+				else if (*_start == '$') {	
+					sprintf(_s, "%i", sh->pid);
+				}
+				strcat(_result, _s);
+				_start++;
+			}
+			else {
+				strcat(_result, "$");
+			}
+			_end = strchr(_start, '$');
+		}
+		strcat(_result, _start);
+		return (strdup(_result));
+	}
+	_end = strchr(_start, '~');
+	if (_end) {
+		while (_end) {
+			if (_end - _start) {
+				strncat(_result, _start, _end - _start);
+			}
+			strcat(_result, getenv("HOME"));
+			_start = _end + 1;
+			_end = strchr(_start, '$');
+		}
+		strcat(_result, _start);
+		return (strdup(_result));
+	}
+	return ((char *) t);
+}

@@ -45,7 +45,7 @@ release : all
 .PHONY : install
 
 install : $(NAME)
-	cp $(NAME) /usr/local/bin
+	cp -f $(NAME) /usr/local/bin
 
 .PHONY : uninstall
 

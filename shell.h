@@ -68,6 +68,7 @@ bool	sh_isdelim(const char *);
 int		sh_exec(t_sh *, char **);
 char	*sh_getline(int);
 char	*sh_strjoinc(char *, char);
+char	*sh_expstr(struct s_shell *, const char *);
 
 /* shell-builtin.c */
 bool	sh_isbltin(const char *);

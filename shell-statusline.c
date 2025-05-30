@@ -1,5 +1,7 @@
 #include "shell.h"
 
+const char	*__sh_shrink_homedir(char *);
+
 /*	Formats:
  *	- %n = host-name
  *	- %d = desktop-name
@@ -53,7 +55,7 @@ char	*sh_statusline(t_sh *sh) {
 					perror("getcwd");
 					break;
 				}
-				strcat(_statusline, _cwd);
+				strcat(_statusline, __sh_shrink_homedir(_cwd));
 			} break;
 			case ('t'): {
 				struct tm	*_time;
@@ -90,4 +92,30 @@ char	*sh_statusline(t_sh *sh) {
 		_start = _end + 1;
 	}
 	return (_statusline);
+}
+
+const char	*__sh_shrink_homedir(char *str) {
+	const char	*_home;
+
+	_home = getenv("HOME");
+	for (size_t	i = 0; str[i]; i++) {
+		if (!strncmp(&(str[i]), _home, strlen(_home))) {
+			size_t	_mov_siz;
+			char	*_start;
+			char	*_end;
+
+			_start = &(str[i+1]);
+			_end = &(str[strlen(_home)]);
+			_mov_siz = strlen(_end);
+			if (_mov_siz) {
+				memmove(_start, _end, _mov_siz);
+				memset(_start + _mov_siz, 0, _mov_siz);
+			}
+			else {
+				memset(_start, 0, _end - _start);
+			}
+			str[i] = '~';
+		}
+	}
+	return (str);
 }
