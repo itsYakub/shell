@@ -28,7 +28,7 @@ int		sh_rc(t_sh *sh, const char *fp) {
 	
 	/* ...finish */
 	sh->aliases = _sh.aliases;
-	if (sh->statusline) {
+	if (_sh.statusline) {
 		sh->statusline = strdup(_sh.statusline);
 		free(_sh.statusline);
 	}
