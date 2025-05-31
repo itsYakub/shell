@@ -39,7 +39,7 @@ debug : all
 
 .PHONY : release
 
-release : CFLAGS += -s -O3
+release : CFLAGS += -O3
 release : all
 
 .PHONY : install

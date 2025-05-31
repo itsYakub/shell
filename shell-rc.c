@@ -28,19 +28,11 @@ int		sh_rc(t_sh *sh, const char *fp) {
 	
 	/* ...finish */
 	sh->aliases = _sh.aliases;
-	sh->statusline = strdup(_sh.statusline);
-	free(_sh.statusline);
+	if (sh->statusline) {
+		sh->statusline = strdup(_sh.statusline);
+		free(_sh.statusline);
+	}
 	sh_free(&_sh);
 	sh_close_fds(&_sh);
 	return (1);
-}
-
-char	*sh_rc_local(void) {
-	static char	_s[PATH_MAX];
-
-	memset(_s, 0, PATH_MAX);
-	strcat(_s, "/home/");
-	strcat(_s, getenv("USER"));
-	strcat(_s, "/.shrc");
-	return (_s);
 }

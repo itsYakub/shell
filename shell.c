@@ -19,6 +19,8 @@ int main(void) {
 }
 
 int	sh_init(t_sh *sh) {
+	char	_path_home[PATH_MAX];
+
 	if (!sh) {
 		return (0);
 	}
@@ -33,7 +35,10 @@ int	sh_init(t_sh *sh) {
 	}
 
 	/* Reading rcfile */
-	if (!sh_rc(sh, sh_rc_local())) {
+	memset(_path_home, 0, PATH_MAX);
+	strcat(_path_home, getenv("HOME"));
+	strcat(_path_home, "/.shrc");
+	if (!sh_rc(sh, _path_home)) {
 		return (0);
 	}
 	return (1);

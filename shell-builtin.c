@@ -249,7 +249,7 @@ static void	__sh_bltin_type_loc(const char *util) {
 			return;
 		while (*_env) {
 			memset(_path, 0, sizeof(_path));
-			_endp = strchrnul(_env, ':');
+			_endp = strchr(_env, ':');
 			strncpy(_path, _env, _endp - _env);
 			strcat(_path, "/");
 			strcat(_path, util);
