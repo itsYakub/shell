@@ -19,7 +19,7 @@ int main(void) {
 }
 
 int	sh_init(t_sh *sh) {
-	char	_path_home[PATH_MAX];
+	t_path	_path_home;
 
 	if (!sh) {
 		return (0);
@@ -62,11 +62,12 @@ int	sh_init_struct(t_sh *sh) {
 		return (0);
 	}	
 	sh->pid = getpid();
+	sh->distro = sh_distro();
 	return (1);
 }
 
 int	sh_init_env(void) {
-	char	_cwd[PATH_MAX];
+	t_path	_cwd;
 	char	*_shlvlstr;
 	int		_shlvl;
 

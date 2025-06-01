@@ -39,7 +39,7 @@ int	sh_bltin_exit(t_sh *sh, char **cmd) {
 }
 
 int	sh_bltin_cd(char **cmd) {
-	char	_cwd[PATH_MAX];
+	t_path	_cwd;
 	char	*_path;
 
 	_path = 0;
@@ -211,7 +211,7 @@ int	sh_bltin_type(t_sh *sh, char **cmd) {
 }
 
 int	sh_bltin_pwd(char **cmd) {
-	char	_cwd[PATH_MAX];
+	t_path	_cwd;
 	char	*_pwd;
 
 	(void) cmd;
@@ -235,7 +235,7 @@ int	sh_bltin_env(char **cmd) {
 }
 
 static void	__sh_bltin_type_loc(const char *util) {
-	char	_path[PATH_MAX];
+	t_path	_path;
 	char	*_env;
 	char	*_endp;
 

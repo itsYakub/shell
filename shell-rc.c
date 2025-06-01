@@ -8,7 +8,7 @@
  *	2.2. All the rest of the lines must be processed as a regular command in the command-line
  * */
 
-int		sh_rc(t_sh *sh, const char *fp) {
+int		sh_rc(t_sh *sh, t_path fp) {
 	t_sh	_sh;
 
 	sh_init_struct(&_sh);

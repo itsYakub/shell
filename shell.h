@@ -8,6 +8,7 @@
 # endif
 # include <fcntl.h>
 # include <stdio.h>
+# include <regex.h>
 # include <stdlib.h>
 # include <string.h>
 # include <unistd.h>
@@ -30,6 +31,7 @@ struct s_shell {
 	char	**tokens;
 	char	*input;
 	char	*statusline;
+	char	*distro;
 	int		exit_stat;
 	int		fd_curin;
 	int		fd_stdin;
@@ -40,6 +42,8 @@ struct s_shell {
 };
 
 typedef struct s_shell	t_sh;
+
+typedef char	t_path[PATH_MAX];
 
 extern char	**environ;
 
@@ -69,6 +73,7 @@ int		sh_exec(t_sh *, char **);
 char	*sh_getline(int);
 char	*sh_strjoinc(char *, char);
 char	*sh_expstr(struct s_shell *, const char *);
+char	*sh_distro(void);
 
 /* shell-builtin.c */
 bool	sh_isbltin(const char *);
@@ -100,7 +105,7 @@ int		sh_export(const char *, const char *);
 int		sh_exporti(const char *, int);
 
 /* shell-rc.c */
-int		sh_rc(t_sh *, const char *);
+int		sh_rc(t_sh *, t_path);
 
 /* shell-kvll.c */
 t_kvll	*sh_kvll(void *, void *);

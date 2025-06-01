@@ -191,3 +191,44 @@ char	*sh_expstr(struct s_shell *sh, const char *t) {
 	}
 	return ((char *) t);
 }
+
+/*	Source:
+ *	- https://lindevs.com/get-linux-distribution-name-using-cpp
+ * */
+char	*sh_distro(void) {
+	static char	_distro[64];
+	char		*_line;
+	regex_t		_regex;
+	regmatch_t	_regmatch[2];
+	int			_regi;
+	int			_fd;
+
+	memset(_distro, 0, sizeof(_distro));
+	_fd = open("/etc/os-release", O_RDONLY);
+	if (_fd == -1) {
+		perror("open");
+		return (0);
+	}
+	_regi = regcomp(&_regex, "^NAME=\"(.*?)\"$", REG_EXTENDED);
+	if (_regi) {
+		perror("regcomp");
+		close(_fd);
+		return (0);
+	}
+	_line = sh_getline(_fd);
+	while (_line) {
+		if (!regexec(&_regex, _line, 2, _regmatch, 0)) {
+			strncpy(_distro, _line + _regmatch[1].rm_so, _regmatch[1].rm_eo - _regmatch[1].rm_so);
+			for (size_t i = 0; i < strlen(_distro); i++) {
+				_distro[i] = tolower(_distro[i]);
+			}
+			free(_line);
+			break;
+		}
+		free(_line);
+		_line = sh_getline(_fd);
+	}
+	regfree(&_regex);
+	close(_fd);
+	return (_distro);
+}
