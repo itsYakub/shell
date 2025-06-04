@@ -12,11 +12,23 @@
 # include <stdlib.h>
 # include <string.h>
 # include <unistd.h>
+# include <getopt.h>
 # include <sys/wait.h>
 # include <sys/param.h>
 # include <sys/utsname.h>
 # include <readline/readline.h>
 # include <readline/history.h>
+# if !defined (_shell_version_major_)
+#  define _shell_version_major_ 1
+# endif
+# if !defined (_shell_version_minor_)
+#  define _shell_version_minor_ 0
+# endif
+# define _shell_version_ "1.0"
+# define _shell_setting_mode_ 0
+# define _shell_setting_read_dotfiles_ 1
+# define _shell_setting_silent_ 2
+# define _shell_setting_count_ 3
 
 struct s_kvll {
 	void			*key;
@@ -28,17 +40,28 @@ typedef struct s_kvll	t_kvll;
 
 struct s_shell {
 	t_kvll	*aliases;
-	char	**tokens;
-	char	*input;
-	char	*statusline;
-	char	*distro;
+	/* settings */
+	struct {
+		int		settings[128];
+	};
+	/* textual information */
+	struct {
+		char	**tokens;
+		char	*input;
+		char	*statusline;
+		char	*distro;
+	};
+	/* file descriptors */
+	struct {
+		int		fd_pipe[2];
+		int		fd_curin;
+		int		fd_stdin;
+		int		fd_stdout;
+		int		fd_null;
+	};
+	/* other */
 	int		exit_stat;
-	int		fd_curin;
-	int		fd_stdin;
-	int		fd_stdout;
-	int		fd_null;
 	int		pid;
-	int		fd_pipe[2];
 };
 
 typedef struct s_shell	t_sh;
@@ -48,12 +71,17 @@ typedef char	t_path[PATH_MAX];
 extern char	**environ;
 
 /* shell.c */
-int		sh_init(t_sh *);
+int		sh_init(t_sh *, int, char **);
+int		sh_init_defopt(t_sh *);
 int		sh_init_struct(t_sh *);
 int		sh_init_env(void);
-int		sh_loop(t_sh *, bool);
+int		sh_loop(t_sh *);
+int		sh_input(t_sh *);
 int		sh_quit(t_sh *);
 int		sh_input(t_sh *);
+
+/* shell-getopt.c */
+int		sh_getopt(t_sh *, int, char **);
 
 /* shell-exec.c */
 int		sh_execute(t_sh *);
@@ -64,7 +92,7 @@ char	**sh_lnsplt(const char *, size_t *);
 bool	sh_parse_err(char **);
 
 /* shell-utils.c */
-void	sh_free(t_sh *);
+void	sh_free_input(t_sh *);
 void	sh_free2d(void **);
 void	sh_close_fds(t_sh *);
 bool	sh_iskeyword(const char *);

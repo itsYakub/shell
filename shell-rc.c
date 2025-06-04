@@ -9,14 +9,18 @@
  * */
 
 int		sh_rc(t_sh *sh, t_path fp) {
-	t_sh	_sh;
+	bool	_read_dotfiles;
 
-	sh_init_struct(&_sh);
+	_read_dotfiles = sh->settings[_shell_setting_read_dotfiles_];
+	if (!_read_dotfiles) {
+		return (1);
+	}
+
 	/* ...Opening dotfile... */
-	_sh.fd_curin = open(fp, O_RDONLY);
-	if (_sh.fd_curin == -1) {
-		_sh.fd_curin = open(fp, O_RDWR | O_CREAT, 0664);
-		if (_sh.fd_curin == -1) {
+	sh->fd_curin = open(fp, O_RDONLY);
+	if (sh->fd_curin == -1) {
+		sh->fd_curin = open(fp, O_RDWR | O_CREAT, 0664);
+		if (sh->fd_curin == -1) {
 			perror("open");
 			return (0);
 		}
@@ -24,15 +28,11 @@ int		sh_rc(t_sh *sh, t_path fp) {
 	}
 	
 	/* ...Processing dotfile... */
-	sh_loop(&_sh, true);
+	sh->settings[_shell_setting_silent_] = true;
+	sh_loop(sh);
+	sh->settings[_shell_setting_silent_] = false;
 	
 	/* ...finish */
-	sh->aliases = _sh.aliases;
-	if (_sh.statusline) {
-		sh->statusline = strdup(_sh.statusline);
-		free(_sh.statusline);
-	}
-	sh_free(&_sh);
-	sh_close_fds(&_sh);
+	close(sh->fd_curin); sh->fd_curin = -1;
 	return (1);
 }

@@ -1,7 +1,7 @@
 #include "shell.h"
 #include <sys/param.h>
 
-void	sh_free(struct s_shell *sh) {
+void	sh_free_input(struct s_shell *sh) {
 	if (sh->input) {
 		free(sh->input); sh->input = 0;
 	}
@@ -22,12 +22,12 @@ void	sh_free2d(void **ptr) {
 }
 
 void	sh_close_fds(t_sh *sh) {
-	close(sh->fd_pipe[0]);
-	close(sh->fd_pipe[1]);
-	close(sh->fd_null);
-	close(sh->fd_curin);
-	dup2(sh->fd_stdin, 0); close(sh->fd_stdin);
-	dup2(sh->fd_stdout, 1); close(sh->fd_stdout);
+	close(sh->fd_pipe[0]); sh->fd_pipe[0] = -1;
+	close(sh->fd_pipe[1]); sh->fd_pipe[1] = -1;
+	close(sh->fd_null); sh->fd_null = -1;
+	close(sh->fd_curin); sh->fd_curin = -1;
+	dup2(sh->fd_stdin, 0); close(sh->fd_stdin); sh->fd_stdin = -1;
+	dup2(sh->fd_stdout, 1); close(sh->fd_stdout); sh->fd_stdout = -1;
 }
 
 bool	sh_iskeyword(const char *cmd) {

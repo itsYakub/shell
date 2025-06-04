@@ -12,6 +12,7 @@ SRCS	= \
 	./shell-kvll.c \
 	./shell-alias.c \
 	./shell-statusline.c \
+	./shell-getopt.c \
 	./shell.c
 OBJS	= $(SRCS:.c=.o)
 NAME	= shell

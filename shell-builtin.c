@@ -35,6 +35,7 @@ int	sh_bltin_exit(t_sh *sh, char **cmd) {
 	}
 
 	sh_quit(sh);
+	printf("exit\n");
 	exit(_exit);
 }
 

@@ -16,6 +16,8 @@ Done:
 
 ToDo:
 
+- [ ] Argument parsing;
+- [ ] Interactive and non-interactive shell;
 - [ ] Advanced completion engine;
 
 Optional:
