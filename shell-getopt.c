@@ -21,7 +21,7 @@ int	sh_getopt(t_sh *sh, int ac, char **av) {
 				sh->settings[_shell_setting_read_dotfiles_] = 0;
 				sh->settings[_shell_setting_silent_] = 1;
 				sh->input = strdup(optarg);
-				sh_input(sh);
+				sh_handle_input(sh);
 				sh_quit(sh);
 				exit (0);
 			} break;

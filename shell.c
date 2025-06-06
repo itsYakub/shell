@@ -107,7 +107,7 @@ int	sh_loop(t_sh *sh) {
 		}
 		signal(SIGINT, __sh_disable_ctrlc);
 		if (sh->input) {
-			if (!sh_input(sh)) {
+			if (!sh_handle_input(sh)) {
 				break;
 			}
 		}
@@ -120,7 +120,7 @@ int	sh_loop(t_sh *sh) {
 	return (1);
 }
 
-int	sh_input(t_sh *sh) {
+int	sh_handle_input(t_sh *sh) {
 	bool	_silent;
 
 	_silent = sh->settings[_shell_setting_silent_];

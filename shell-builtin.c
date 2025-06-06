@@ -74,8 +74,6 @@ int	sh_bltin_cd(char **cmd) {
 }
 
 int	sh_bltin_export(char **cmd) {
-	char	*_key;
-	char	*_value;
 	char	*_start;
 	char	*_end;
 
@@ -86,40 +84,22 @@ int	sh_bltin_export(char **cmd) {
 		}
 		return (1);
 	}
-	if (!*(cmd + 1) || strcmp(*(cmd + 1), "|")) {
-		_key = _value = 0;
-		_start = _end = *cmd;
-		while (*_end && *_end != '=')
+	if (!*(cmd + 1) || !sh_iskeyword(*(cmd + 1))) {
+		_end = _start = *cmd;
+		while (*_end && *_end != '=') {
 			_end++;
-		_key = (char *) calloc(_end - _start, sizeof(char));
-		if (!_key) {
-			perror("calloc");
+		}
+		if (!*_end) {
 			return (0);
 		}
-		_key = strncpy(_key, _start, _end - _start);
-		if (!*_end) {
-			if (!sh_export(_key, "")) {
-				perror("setenv");
-				return (0);
-			}
-		}
 		else {
-			_start = ++_end;
-			while (*_end)
-				_end++;
-			_value = (char *) calloc(_end - _start + 1, sizeof(char));
-			if (!_value) {
-				perror("calloc");
-				free(_key);
+			*_end = 0;
+			if (!sh_export(_start, (_end + 1))) {
 				return (0);
 			}
-			_value = strncpy(_value, _start, _end - _start);
-			if (!sh_export(_key, _value)) {
-				perror("setenv");
-				return (0);
-			}
+			*_end = '=';
+			return (1);
 		}
-		return (1);
 	}
 	return (0);
 }

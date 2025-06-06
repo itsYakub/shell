@@ -76,7 +76,7 @@ int		sh_init_defopt(t_sh *);
 int		sh_init_struct(t_sh *);
 int		sh_init_env(void);
 int		sh_loop(t_sh *);
-int		sh_input(t_sh *);
+int		sh_handle_input(t_sh *);
 int		sh_quit(t_sh *);
 int		sh_input(t_sh *);
 

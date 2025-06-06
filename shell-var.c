@@ -18,11 +18,13 @@ char	**sh_expand(t_sh *sh, char **cmd) {
 int	sh_export(const char *key, const char *value) {
 	if (getenv(key)) {
 		if (setenv(key, value, 1) == -1) {
+			perror("setenv");
 			return (0);
 		}
 	}
 	else {
 		if (setenv(key, value, 0) == -1) {
+			perror("setenv");
 			return (0);
 		}
 	}
